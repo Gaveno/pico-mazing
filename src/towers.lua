@@ -18,59 +18,73 @@ tower_menu_open_delay = 0
 tower_types = {
     {
         name = 'Triangle',
-        cost = 2,
+        cost = 1,
         attack_type = 2, -- 'pixel_shot',
         attack_power = 1,
         attack_range = 2 * CELL_SIZE,
         attack_speed = 30,
         splash = 0,
         projectile_speed = 0,
+        proj_launch_x = 3,
+        proj_launch_y = 2,
         draw = function(tower, x, y)
-            -- Draw red filled triangle
+            -- Draw Lightning Tower
             local image = 0
             if tower.cooldown > 20 then
-                image = (tower.cooldown / 2) % 2
+                image = 1 + (tower.cooldown / 2) % 2
             end
-            spr(32 + image, x, y) -- Triangle
+            spr(34 + image, x, y)
         end
     },
     {
         name = 'Circle',
-        cost = 3,
+        cost = 2,
         attack_type = 0, --'pixel_shot',
-        attack_power = 2,
+        attack_power = 3,
         attack_range = 3 * CELL_SIZE,
         attack_speed = 30,
         splash = 0,
         projectile_speed = 2,
+        proj_launch_x = 3,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
-            -- Draw yellow filled circle
-            circfill(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 3, 10) -- Yellow
+            local image = 0
+            if tower.cooldown > 20 then
+                image = 1
+            end
+            spr(50 + image, x, y)
         end
     },
     {
         name = 'Square',
-        cost = 5,
+        cost = 4,
         attack_type = 1, --'bomb',
         attack_power = 4,
         attack_range = 4 * CELL_SIZE,
         attack_speed = 50,
         splash = 1,
         projectile_speed = 1,
+        proj_launch_x = 3,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
-            -- Draw blue filled square
-            rectfill(x + 1, y + 1, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 9) -- Blue
+            local image = 0
+            if tower.cooldown > 30 then
+                image = 1
+            end
+            spr(image, x, y)
         end
     },
     {
         name = 'Stacked Circle',
-        cost = 7,
+        cost = 6,
         attack_type = 1, --'bomb',
         attack_power = 4,
         attack_range = 4 * CELL_SIZE,
         attack_speed = 15,
         splash = 1,
         projectile_speed = 2,
+        proj_launch_x = 3,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
             -- Draw yellow circle with white inner circle
             circfill(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 3, 10) -- Outer circle (Yellow)
@@ -86,6 +100,8 @@ tower_types = {
         attack_speed = 20,
         splash = 0,
         projectile_speed = 0,
+        proj_launch_x = 3,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
             local image = 0
             if tower.cooldown > 10 then
@@ -102,11 +118,12 @@ tower_types = {
         attack_range = 6 * CELL_SIZE,
         attack_speed = 80,
         splash = 2,
-        projectile_speed = 1,
+        projectile_speed = 3,
+        proj_launch_x = 3,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
-            -- Draw blue square with smaller white square
-            rectfill(x + 1, y + 1, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 9) -- Outer square (Blue)
-            rectfill(x + 3, y + 3, x + CELL_SIZE - 4, y + CELL_SIZE - 4, 7) -- Inner square (White)
+            local image = tower.cooldown / (tower.type.attack_speed - 5) * 6
+            spr(52 + image, x, y)
         end
     }
 }
@@ -119,7 +136,10 @@ function update_towers()
     end
 
     for _, tower in pairs(towers) do
-        tower.cooldown -= 1
+        if tower.cooldown > 0 then
+            tower.cooldown -= 1
+        end
+
         if tower.cooldown <= 0 then
             if tower.target_unit == nil or tower.target_unit.health <= 0 then
                 tower.target_unit = find_nearest_unit_in_range(tower)
@@ -248,8 +268,7 @@ end
 
 -- Check if a tower can be built at the specified location
 function can_build_tower_at(x, y)
-    local can_build = grid[x][y]
-    if can_build then
+    if grid[x][y] and get_tower_at(x, y) == nil then
         -- Check if path from spawn to exit exists after building the tower
         printh("Checking if there's a valid path with this tower being built")
         towers[x .. ',' .. y] = {
@@ -289,7 +308,7 @@ function draw_tower_menu()
 
     -- Draw selected tower
     local tower_type = tower_types[tower_menu_index]
-    tower_type.draw({cooldown = 0}, x + 2, y + POPUP_MENU_HEIGHT / 2 - 4)
+    tower_type.draw({cooldown = 0, type = tower_type}, x + 2, y + POPUP_MENU_HEIGHT / 2 - 4)
 
     -- Draw cost
     local cost = tower_type.cost
@@ -330,7 +349,7 @@ function draw_sell_menu()
 
     -- Draw tower being sold
     local tower = get_tower_at(cursor.x, cursor.y)
-    tower.type.draw({cooldown = 0}, x + 2, y + 2)
+    tower.type.draw({cooldown = 0, type = tower.type}, x + 2, y + 2)
 
     -- Draw sell price
     local refund = ceil(tower.type.cost / 2)

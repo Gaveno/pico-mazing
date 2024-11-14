@@ -6,11 +6,10 @@ unit_path_delay = 0
 unit_types_list = {}
 unit_types_list['Circle'] = {
     name = 'Circle',
-    health = function(wave_number) return 5 * wave_number / 2 end,
+    health = function(wave_number) return 6 * wave_number / 2 end,
     speed = 5,
     draw = function(unit, x, y)
-        -- Draw green circle
-        -- circfill(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 3, 11) -- Light green
+        -- Draw Walker
         palt(1, true)
         local flip = false
         if flr(unit.lifetime / 4) % 2 == 0 then
@@ -23,25 +22,37 @@ unit_types_list['Circle'] = {
 }
 unit_types_list['Square'] = {
     name = 'Square',
-    health = function(wave_number) return 7 * wave_number / 2 end,
+    health = function(wave_number) return 8 * wave_number / 2 end,
     speed = 4,
     draw = function(unit, x, y)
-        -- Draw dark blue square
-        rectfill(x + 1, y + 1, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 1) -- Dark blue
+        -- Draw Knight Walker
+        palt(1, true)
+        local flip = false
+        if flr(unit.lifetime / 6) % 2 == 0 then
+            flip = true
+        end
+
+        spr(21, x, y, 1, 1, flip, false)
+        palt()
     end
 }
 unit_types_list['Triangle'] = {
     name = 'Triangle',
-    health = function(wave_number) return 3 * wave_number / 2 end,
+    health = function(wave_number) return 5 * wave_number / 2 end,
     speed = 6,
     draw = function(unit, x, y)
-        -- Draw orange triangle
-        spr(2, x, y) -- Unit Triangle
+        -- Draw Lizard
+        local flip = false
+        if flr(unit.lifetime / 10) % 2 == 0 then
+            flip = true
+        end
+
+        spr(37 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
     end
 }
 unit_types_list['Star'] = {
     name = 'Star',
-    health = function(wave_number) return 3 * wave_number / 2 end,
+    health = function(wave_number) return 4 * wave_number / 2 end,
     speed = 4,
     draw = function(unit, x, y)
         -- Draw bat
@@ -64,14 +75,6 @@ unit_types_list['Star'] = {
  function update_unit_paths()
     for unit in all(units) do
         unit.path = nil
-        -- local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
-        -- if unit_path then
-        --     unit.path = unit_path
-        --     unit.path_index = 2
-        -- else
-        --     -- No path for this unit, remove it
-        --     del(units, unit)
-        -- end
     end
 end
 
@@ -80,8 +83,6 @@ function spawn_unit(unit_type)
     local spawn_x = ceil(rnd(GRID_WIDTH))
     local spawn_y = ceil(rnd(2))
 
-    -- local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
-    -- if path then
     local unit = {
         x = spawn_x,
         y = spawn_y,
@@ -94,10 +95,6 @@ function spawn_unit(unit_type)
         lifetime = 0
     }
     add(units, unit)
-    -- else
-    --     -- No path available, units cannot spawn
-    --     printh("Error spawning unit: "..unit_type.name.." no valid path found from: ("..spawn_x..","..spawn_y..")")
-    -- end
 end
 
 -- Update units (movement and removal)
@@ -105,8 +102,7 @@ function update_units()
     if unit_path_delay > 0 then
         unit_path_delay -= 1
     end
-    
-    -- local path_iteration_used = false
+
     for i = #units, 1, -1 do
         local unit = units[i]
         unit.lifetime += 1
@@ -117,8 +113,7 @@ function update_units()
             if unit_path then
                 unit.path = unit_path
                 unit.path_index = 2
-                unit_path_delay = 3
-                -- path_iteration_used = true
+                unit_path_delay = 10
             end
         end
 
@@ -134,6 +129,7 @@ function update_units()
                 end
             end
             if unit.y >= GRID_HEIGHT - 1 and unit.x > GRID_WIDTH/2 - 2 and unit.x <= GRID_WIDTH/2 + 2 then
+                unit.health = 0
                 del(units, unit)
                 lives -= 1
                 if lives <= 0 then

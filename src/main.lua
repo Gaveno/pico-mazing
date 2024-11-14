@@ -36,7 +36,7 @@ function _update()
         update_tower_menu()
     elseif game_state == 'sell_menu' then
         update_sell_menu()
-    elseif game_state == 'victory' then
+    elseif game_state == 'victory' or game_state == 'defeat' then
         if btnp(5) or btnp(4) then
             _init()
         end

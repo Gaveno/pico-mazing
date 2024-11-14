@@ -38,11 +38,6 @@ end
 function start_wave()
     wave_units_to_spawn = get_wave_unit_total(wave_number)
     wave_spawning_unit_type = next_unit_type
-    -- local num_units = get_wave_unit_total(wave_number) -- First wave has 3 units
-    -- for i = 1, num_units do
-    --     spawn_unit(next_unit_type)
-    -- end
-
     next_unit_type = get_next_unit_type()
 end
 

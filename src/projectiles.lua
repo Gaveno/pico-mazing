@@ -10,8 +10,8 @@ function create_projectile(tower, target_unit)
     end
     local projectile = {
         type = tower.type.attack_type,
-        x = (tower.x - 1) * CELL_SIZE + CELL_SIZE / 2,
-        y = (tower.y - 1) * CELL_SIZE + CELL_SIZE / 2,
+        x = (tower.x - 1) * CELL_SIZE + tower.type.proj_launch_x,
+        y = (tower.y - 1) * CELL_SIZE + tower.type.proj_launch_y,
         target = target_unit,
         speed = tower.type.projectile_speed,
         attack_power = tower.type.attack_power,
@@ -147,8 +147,14 @@ function draw_projectiles()
             -- printh("Drawing pixel shot at: ("..x..","..y..")")
             pset(x, y, 7) -- White pixel
         elseif proj.type == 1 then
-            local scaler = proj.lifetime % proj.splash
-            rectfill(x - 1 - scaler, y - 1 - scaler, x + 1 + scaler, y + 1 + scaler, 8) -- Red square bomb
+            local yimage = proj.splash - 1
+            palt(0, false)
+            palt(1, true)
+            sspr(48 + (flr(proj.lifetime / 4) % 2) * 4, 8 + yimage * 4, 4, 4, x-1, y-1)
+            palt()
+            -- spr(22 , x-1, y-1, 0.5, 0.5)
+            -- local scaler = proj.lifetime % proj.splash
+            -- rectfill(x - 1 - scaler, y - 1 - scaler, x + 1 + scaler, y + 1 + scaler, 8) -- Red square bomb
         elseif proj.type == 2 then
             if proj.lifetime < proj.max_lifetime and proj.lifetime % 2 == 0 then
                 -- Draw laser beam
