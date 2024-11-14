@@ -38,7 +38,8 @@ function find_path(start_x, start_y, goal_x, goal_y)
         local neighbors = get_neighbors(current_node.x, current_node.y)
         for _, neighbor in ipairs(neighbors) do
             if not in_list(closed_list, neighbor.x, neighbor.y) then
-                local tentative_g = current_node.g + 1 -- assuming cost between nodes is 1
+                local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.4142
+                local tentative_g = current_node.g + movement_cost
                 local neighbor_in_open = in_open_list(open_list, neighbor.x, neighbor.y)
                 if not neighbor_in_open or tentative_g < neighbor_in_open.g then
                     came_from[neighbor.x .. ',' .. neighbor.y] = current_node
@@ -51,6 +52,7 @@ function find_path(start_x, start_y, goal_x, goal_y)
                 end
             end
         end
+        
     end
 
     -- No path found
@@ -58,31 +60,59 @@ function find_path(start_x, start_y, goal_x, goal_y)
 end
 
 function heuristic(x1, y1, x2, y2)
-    -- Use Manhattan distance
-    return abs(x1 - x2) + abs(y1 - y2)
+    local dx = abs(x1 - x2)
+    local dy = abs(y1 - y2)
+    local F = 1.0
+    local D = 1.2--1.4142
+    return F * (dx + dy) + (D - 2 * F) * min(dx, dy)
 end
 
 function get_neighbors(x, y)
     local neighbors = {}
     local directions = {
-        {dx = 0, dy = -1}, -- up
-        {dx = -1, dy = 0}, -- left
-        {dx = 1, dy = 0},  -- right
-        {dx = 0, dy = 1},  -- down
+        {dx = -1, dy = -1}, -- up-left
+        {dx =  0, dy = -1}, -- up
+        {dx =  1, dy = -1}, -- up-right
+        {dx = -1, dy =  0}, -- left
+        {dx =  1, dy =  0}, -- right
+        {dx = -1, dy =  1}, -- down-left
+        {dx =  0, dy =  1}, -- down
+        {dx =  1, dy =  1}, -- down-right
     }
 
     for _, dir in ipairs(directions) do
-        local nx, ny = x + dir.dx, y + dir.dy
+        local nx = x + dir.dx
+        local ny = y + dir.dy
+
+        -- Check if the new position is within grid boundaries
         if nx >= 1 and nx <= GRID_WIDTH and ny >= 1 and ny <= GRID_HEIGHT then
-            local tower = get_tower_at(nx, ny) --grid[nx][ny]
+            local tower = get_tower_at(nx, ny)
             if tower == nil then
-                add(neighbors, {x = nx, y = ny})
+                local valid = true
+
+                -- If moving diagonally, check for diagonal cuts
+                if dir.dx ~= 0 and dir.dy ~= 0 then
+                    -- Check if adjacent cells are blocked
+                    local cell1 = get_tower_at(x + dir.dx, y)
+                    local cell2 = get_tower_at(x, y + dir.dy)
+                    if cell1 ~= nil or cell2 ~= nil then
+                        -- One or both adjacent cells are blocked; cannot move diagonally
+                        valid = false
+                    end
+                end
+
+                -- Add the neighbor if movement is valid
+                if valid then
+                    add(neighbors, {x = nx, y = ny, dx = dir.dx, dy = dir.dy})
+                end
             end
         end
     end
 
     return neighbors
 end
+
+
 
 function in_list(list, x, y)
     for _, node in ipairs(list) do
@@ -109,9 +139,7 @@ function draw_path(path_index, path)
             local node = path[i]
             local x = (node.x - 1) * CELL_SIZE + CELL_SIZE / 2
             local y = (node.y - 1) * CELL_SIZE + CELL_SIZE / 2
-            circfill(x, y, 5, 12)
-            -- printh("node: "..i.." x: "..x.." y: "..y)
-            -- pset(x, y, 12) -- Light blue
+            circfill(x, y, 2, 12)
         end
     end
 end
