@@ -1,6 +1,14 @@
 -- CONSTANTS
-POPUP_MENU_WIDTH = 48
+POPUP_MENU_WIDTH = 56
 POPUP_MENU_HEIGHT = 26
+POPUP_MENU_TOWER_STATS = 3
+POPUP_MENU_TOWER_STAT_SEP = flr(POPUP_MENU_HEIGHT / POPUP_MENU_TOWER_STATS)
+MAX_TOWER_RANGE = 5 * CELL_SIZE
+MIN_TOWER_RANGE = 1 * CELL_SIZE
+MAX_TOWER_POWER = 8
+MIN_TOWER_ATTACK_SPEED = 20 / 3
+MAX_TOWER_ATTACK_SPEED = 80
+
 
 -- Variables
 tower_menu_index = 1
@@ -255,7 +263,7 @@ function sell_tower(x, y)
     local tower = get_tower_at(x, y)
     if tower then
         -- Refund diamonds
-        local refund = ceil(tower.type.cost / 2)
+        local refund = flr(tower.type.cost * 0.75)
         diamonds += refund
 
         -- Remove tower
@@ -301,14 +309,14 @@ end
 
 function draw_tower_menu()
     local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20 + tower_menu_shake % 3, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
-    local y = mid(0, (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10 + tower_menu_shake % 2, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
+    local y = mid(25, (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10 + tower_menu_shake % 2, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
 
     -- Draw menu background
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
 
     -- Draw selected tower
     local tower_type = tower_types[tower_menu_index]
-    tower_type.draw({cooldown = 0, type = tower_type}, x + 2, y + POPUP_MENU_HEIGHT / 2 - 4)
+    tower_type.draw({cooldown = 0, type = tower_type}, x + 10, y + POPUP_MENU_HEIGHT / 2 - 4)
 
     -- Draw cost
     local cost = tower_type.cost
@@ -316,9 +324,32 @@ function draw_tower_menu()
         if i > diamonds then
             pal(12, 8)
         end
-        spr(7, x + 13 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
+        spr(7, x + 21 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
     pal()
+
+    -- Draw tower stats
+    -- Attack type
+    local stat_start_y = y + flr(POPUP_MENU_TOWER_STAT_SEP / 2)
+
+    if tower_type.attack_type == 2 then
+        line(x + 2, stat_start_y + 1, x + 6, stat_start_y + 5, 7)
+    else
+        circ(x + 5, stat_start_y + 3, tower_type.splash, 7)
+    end
+
+    -- Power
+    local power_width = 6
+    for i = 1, ceil(tower_type.attack_power / MAX_TOWER_POWER * power_width)  do
+        local line_bottom = flr(stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 1.5)
+        local line_x = x + 8 - i
+        line(line_x, line_bottom - ceil(i * 0.6), line_x, line_bottom, 10 - flr((i-1) / power_width * 3))
+    end
+
+    -- Range
+    local range_number = flr((tower_type.attack_range - MIN_TOWER_RANGE - 2) / MAX_TOWER_RANGE * 4)
+    local range_image_x = 84 - range_number * 4
+    sspr(range_image_x, 16, 4, 6, x + 4, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 2)
 
     -- Arrows
     if btn(2) then
@@ -352,7 +383,7 @@ function draw_sell_menu()
     tower.type.draw({cooldown = 0, type = tower.type}, x + 2, y + 2)
 
     -- Draw sell price
-    local refund = ceil(tower.type.cost / 2)
+    local refund = flr(tower.type.cost * 0.75)
     for i = 1, refund do
         spr(7, x + 12 + (i - 1) * 8, y + 2)
     end

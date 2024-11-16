@@ -47,3 +47,7 @@ function sprr(n, x, y, r, w, h)
         end
     end
 end
+
+function lerp(x, x1, x2)
+    return x1 + x * (x2 - x1)
+end
