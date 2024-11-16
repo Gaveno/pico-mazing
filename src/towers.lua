@@ -38,9 +38,9 @@ tower_types = {
     },
     {
         name = 'Circle',
-        cost = 2,
+        cost = 3,
         attack_type = 0, --'pixel_shot',
-        attack_power = 3,
+        attack_power = 5,
         attack_range = 3 * CELL_SIZE,
         attack_speed = 30,
         splash = 0,
@@ -59,7 +59,7 @@ tower_types = {
         name = 'Square',
         cost = 4,
         attack_type = 1, --'bomb',
-        attack_power = 4,
+        attack_power = 5,
         attack_range = 4 * CELL_SIZE,
         attack_speed = 50,
         splash = 1,
@@ -112,7 +112,7 @@ tower_types = {
     },
     {
         name = 'Stacked Square',
-        cost = 10,
+        cost = 12,
         attack_type = 1, --'bomb',
         attack_power = 8,
         attack_range = 6 * CELL_SIZE,
@@ -268,9 +268,9 @@ end
 
 -- Check if a tower can be built at the specified location
 function can_build_tower_at(x, y)
-    if grid[x][y] and get_tower_at(x, y) == nil then
+    if grid[x][y].can_build and grid[x][y].unid_id == nil and get_tower_at(x, y) == nil then
         -- Check if path from spawn to exit exists after building the tower
-        printh("Checking if there's a valid path with this tower being built")
+        -- printh("Checking if there's a valid path with this tower being built")
         towers[x .. ',' .. y] = {
             x = x,
             y = y,

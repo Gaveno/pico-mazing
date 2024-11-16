@@ -11,8 +11,10 @@ wave_spawning_unit_type = nil
 function update_waves()
     -- Check if wave is still spawning
     if wave_units_to_spawn > 0 then
-        spawn_unit(wave_spawning_unit_type)
-        wave_units_to_spawn -= 1
+        local spawned_unit = spawn_unit(wave_spawning_unit_type)
+        if spawned_unit then
+            wave_units_to_spawn -= 1
+        end
     end
 
     -- Check if game has been won
@@ -38,9 +40,13 @@ end
 function start_wave()
     wave_units_to_spawn = get_wave_unit_total(wave_number)
     wave_spawning_unit_type = next_unit_type
+    -- Bosses have their own fixed number of spawns
+    if wave_spawning_unit_type.type == 'boss' then
+        wave_units_to_spawn = wave_spawning_unit_type.spawn_number
+    end
     next_unit_type = get_next_unit_type()
 end
 
 function get_wave_unit_total(wave)
-    return 2 + ceil(wave / 2)
+    return 2 + ceil(wave / 3)
 end

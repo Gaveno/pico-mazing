@@ -4,6 +4,7 @@ game_state = 'normal' -- 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat
 
 -- Initialize grid and game elements
 function _init()
+    printh("---- Game start ----")
     init_grid()
 
     -- Reset game variables
