@@ -2,6 +2,7 @@
 units = {}
 unit_path_delay = 0
 next_unit_id = 0
+chicken_deploy_y = 0
 
  -- Define the unit types list
 unit_types_list = {}
@@ -82,6 +83,7 @@ unit_types_list['Star'] = {
 unit_types_list['Chicken'] = {
     name = 'Chicken',
     type = 'elite',
+    spawn_rate = 30,
     health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
     speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
     movement_type = 'fly',
@@ -179,7 +181,7 @@ function spawn_unit(unit_type, x, y)
     local spawn_y = (y or ceil(rnd(2)))
 
     if unit_type.name == 'Chicken' then
-        spawn_y = ceil(rnd(GRID_HEIGHT))
+        spawn_y = chicken_deploy_y
         spawn_x = 1
     end
 
@@ -309,12 +311,13 @@ function get_next_unit_type()
         unit_probs = {
             {type = unit_types_list['Carrier'], prob = 1.0},
         }
-    elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
-    wave_number == 23 or wave_number == 27 then
-        unit_probs = {
-            {type = unit_types_list['Chicken'], prob = 1.0},
-        }
+    -- elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
+    -- wave_number == 23 or wave_number == 27 then
+    --     unit_probs = {
+    --         {type = unit_types_list['Chicken'], prob = 1.0},
+    --     }
     end
+
     -- Randomly select unit type based on probabilities
     local r = rnd(1)
     local cumulative = 0
@@ -324,6 +327,12 @@ function get_next_unit_type()
             return unit_probs[i].type
         end
     end
+
+    -- Set chicken deploy
+    if unit_probs[1].type.name == 'Chicken' then
+        chicken_deploy_y = ceil(rnd(GRID_HEIGHT - 3))
+    end
+
     return unit_probs[1].type -- Default to first type
 end
 

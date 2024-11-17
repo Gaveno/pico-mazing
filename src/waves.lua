@@ -6,14 +6,20 @@ wave_number = 1
 wave_timer = WAVE_PREP_TIME + 10
 wave_units_to_spawn = 0
 wave_spawning_unit_type = nil
+chicken_spawn_delay = 0
 
 -- Update wave timing and spawning units
 function update_waves()
     -- Check if wave is still spawning
     if wave_units_to_spawn > 0 then
-        local spawned_unit = spawn_unit(wave_spawning_unit_type)
-        if spawned_unit then
-            wave_units_to_spawn -= 1
+        if wave_spawning_unit_type.name == 'Chicken' and chicken_spawn_delay > 0 then
+            chicken_spawn_delay -= 1
+        else
+            chicken_spawn_delay = unit_types_list['Chicken'].spawn_rate
+            local spawned_unit = spawn_unit(wave_spawning_unit_type)
+            if spawned_unit then
+                wave_units_to_spawn -= 1
+            end
         end
     end
 
