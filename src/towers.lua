@@ -1,13 +1,14 @@
 -- CONSTANTS
 POPUP_MENU_WIDTH = 56
 POPUP_MENU_HEIGHT = 26
-POPUP_MENU_TOWER_STATS = 3
-POPUP_MENU_TOWER_STAT_SEP = flr(POPUP_MENU_HEIGHT / POPUP_MENU_TOWER_STATS)
+POPUP_MENU_TOWER_STATS = 4
+POPUP_MENU_TOWER_STAT_SEP = 7
 MAX_TOWER_RANGE = 5 * CELL_SIZE
 MIN_TOWER_RANGE = 1 * CELL_SIZE
 MAX_TOWER_POWER = 8
 MIN_TOWER_ATTACK_SPEED = 20 / 3
 MAX_TOWER_ATTACK_SPEED = 80
+SCALE_TOWER_ATTACK_SPEED = (MAX_TOWER_ATTACK_SPEED - MIN_TOWER_ATTACK_SPEED)
 
 
 -- Variables
@@ -308,8 +309,12 @@ function draw_towers()
 end
 
 function draw_tower_menu()
-    local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20 + tower_menu_shake % 3, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
-    local y = mid(25, (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10 + tower_menu_shake % 2, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
+    local cursor_y = -1
+    if cursor.y <= 8 then
+        cursor_y = 6
+    end
+    local x = mid(0, (cursor.x - 2) * CELL_SIZE - 18 + tower_menu_shake % 3, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
+    local y = mid(25, (cursor.y + cursor_y) * CELL_SIZE - POPUP_MENU_HEIGHT - 10 + tower_menu_shake % 2, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
 
     -- Draw menu background
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
@@ -330,12 +335,12 @@ function draw_tower_menu()
 
     -- Draw tower stats
     -- Attack type
-    local stat_start_y = y + flr(POPUP_MENU_TOWER_STAT_SEP / 2)
+    local stat_start_y = y + 1
 
     if tower_type.attack_type == 2 then
         line(x + 2, stat_start_y + 1, x + 6, stat_start_y + 5, 7)
     else
-        circ(x + 5, stat_start_y + 3, tower_type.splash, 7)
+        circ(x + 4, stat_start_y + 2, tower_type.splash, 7)
     end
 
     -- Power
@@ -349,7 +354,24 @@ function draw_tower_menu()
     -- Range
     local range_number = flr((tower_type.attack_range - MIN_TOWER_RANGE - 2) / MAX_TOWER_RANGE * 4)
     local range_image_x = 84 - range_number * 4
-    sspr(range_image_x, 16, 4, 6, x + 4, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 2)
+    sspr(range_image_x, 16, 4, 6, x + 3, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 2 - 1)
+
+    -- Attack Speed
+    local practical_attack_speed = tower_type.attack_speed
+    if tower_type.attack_type == 2 then
+        practical_attack_speed = practical_attack_speed / 3
+    end
+
+    local attack_percent = percent_range(
+        (MAX_TOWER_ATTACK_SPEED - practical_attack_speed + 15),
+        MIN_TOWER_ATTACK_SPEED, MAX_TOWER_ATTACK_SPEED
+    )
+    local images = ceil(attack_percent * 3)
+    pal(7, 8 + flr(attack_percent * 4))
+    for i = 1, images do 
+        sspr(120, 0, 2, 4, x + i * 3, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 3)
+    end
+    pal()
 
     -- Arrows
     if btn(2) then

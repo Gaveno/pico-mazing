@@ -51,3 +51,7 @@ end
 function lerp(x, x1, x2)
     return x1 + x * (x2 - x1)
 end
+
+function percent_range(x, x1, x2)
+    return (x - x1) / (x2 - x1)
+end
