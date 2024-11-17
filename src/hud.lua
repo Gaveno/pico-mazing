@@ -7,6 +7,7 @@ HUD_HEIGHT = 16
 lives = 6
 diamonds = 5
 next_unit_type = nil
+diamond_wave = 0
 
 function draw_hud()
      -- Black background
@@ -21,10 +22,20 @@ function draw_hud()
     end
 
     -- Draw diamonds
+    local tower_cost = 0
+    if game_state == 'tower_menu' then
+        tower_cost = tower_types[tower_menu_index].cost
+        diamond_wave = (diamond_wave + 1) % 100
+    end
+
     for i = 1, min(diamonds+1, 19) do
         local di = (i - 1) % 9
         local dx = di * 8 --+ di
         local dy = ceil(i / 9 - 1) * 8
+        if tower_cost ~= 0 and i-1 <= tower_cost then
+            dy += sin((diamond_wave - i) % 10 / 10)
+        end
+
         if i == 18 and diamonds+1 >= 19 then
             spr(23, SCREEN_WIDTH - dx, dy)
         else

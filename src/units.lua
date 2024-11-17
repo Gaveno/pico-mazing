@@ -45,7 +45,7 @@ unit_types_list['Triangle'] = {
     name = 'Triangle',
     type = 'basic',
     health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
-    speed = function(unit, wave_number) return 6 + flr(wave_number / 5) * 2 end,
+    speed = function(unit, wave_number) return 6 + flr(wave_number / 5) * 2 + flr(wave_number / 10) * 2 end,
     movement_type = 'walk',
     draw = function(unit, x, y)
         -- Draw Lizard
@@ -77,6 +77,24 @@ unit_types_list['Star'] = {
         spr(24 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
 
         palt()
+    end
+}
+unit_types_list['Chicken'] = {
+    name = 'Chicken',
+    type = 'elite',
+    health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+    speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
+    movement_type = 'fly',
+    init = function(unit)
+        if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
+    end,
+    draw = function(unit, x, y)
+        if not unit.is_rooster then
+            unit.is_rooster = 0
+        end
+
+        spr(64 + unit.is_rooster, x, y)
+
     end
 }
 
@@ -160,6 +178,11 @@ function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
 
+    if unit_type.name == 'Chicken' then
+        spawn_y = ceil(rnd(GRID_HEIGHT))
+        spawn_x = 1
+    end
+
     if grid[spawn_x][spawn_y].unit_id == nil then
 
         local unit = {
@@ -175,6 +198,11 @@ function spawn_unit(unit_type, x, y)
             id = next_unit_id,
             ability_cooldown = 0,
         }
+
+        -- Initialize if has init function
+        if unit.type.init then
+            unit.type.init(unit)
+        end
 
         grid[spawn_x][spawn_y].unit_id = unit.id
 
@@ -206,7 +234,24 @@ function update_units()
         end
 
         -- Move the unit according to it's movement_type
-        if unit.type.movement_type == 'fly' then
+        if unit.move_type then
+            if unit.move_type == 'fly' then
+                move_star_unit(unit)
+            else
+                -- Find path if doesn't have one
+                if unit.path == nil and unit_path_delay <= 0 then
+                    local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
+                    if unit_path then
+                        unit.path = unit_path
+                        unit.path_index = 1
+                        unit_path_delay = 10
+                    end
+                end
+            end
+
+            move_unit_along_path(unit)
+
+        elseif unit.type.movement_type == 'fly' then
             move_star_unit(unit)
         else
             -- Find path if doesn't have one
@@ -263,6 +308,11 @@ function get_next_unit_type()
     if wave_number == 9 or wave_number == 29 then
         unit_probs = {
             {type = unit_types_list['Carrier'], prob = 1.0},
+        }
+    elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
+    wave_number == 23 or wave_number == 27 then
+        unit_probs = {
+            {type = unit_types_list['Chicken'], prob = 1.0},
         }
     end
     -- Randomly select unit type based on probabilities
