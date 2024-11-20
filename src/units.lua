@@ -85,17 +85,57 @@ unit_types_list['Chicken'] = {
     type = 'elite',
     spawn_rate = 30,
     health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
-    speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
+    speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
     movement_type = 'fly',
     init = function(unit)
+        printh("Initializing chicken")
         if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
+        if unit.is_rooster then
+            unit.health = unit.health * 1.4
+        end
+
+        unit.fly_duration = 30 + flr(rnd(90))
+        unit.flying = true
     end,
     draw = function(unit, x, y)
         if not unit.is_rooster then
             unit.is_rooster = 0
         end
 
-        spr(64 + unit.is_rooster, x, y)
+        local image = 64
+        if unit.flying then
+            image = 80
+        end
+
+        local flip = false
+        if flr(unit.lifetime / 10) % 2 == 0 then
+            flip = true
+        end
+
+        spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y)
+    end,
+    update = function(unit, x, y)
+        if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then
+            printh("chicken still flying")
+            unit.py = chicken_deploy_y * CELL_SIZE
+            unit.fly_duration -= 1
+        else
+            if unit.flying then
+                local land_x = ceil((unit.px) / CELL_SIZE) + 1
+                local land_y = ceil((unit.py) / CELL_SIZE)
+                printh("chicken trying to land at: "..land_x..", "..land_y)
+
+                if get_tower_at(land_x, land_y) == nil and grid[land_x][land_y].unit_id == nil then
+                    printh("chicken landing")
+                    unit.flying = false
+                    unit.movement_type = 'walk'
+                    unit.x = land_x
+                    unit.y = land_y
+                end
+            end
+        end
+
+        -- TO-DO: How to land this sucker?
 
     end
 }
@@ -180,10 +220,13 @@ function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
 
+
     if unit_type.name == 'Chicken' then
         spawn_y = chicken_deploy_y
         spawn_x = 1
     end
+
+    printh("unit type: "..unit_type.name.." spawn y: "..spawn_y.." spawn x: "..spawn_x)
 
     if grid[spawn_x][spawn_y].unit_id == nil then
 
@@ -206,7 +249,9 @@ function spawn_unit(unit_type, x, y)
             unit.type.init(unit)
         end
 
-        grid[spawn_x][spawn_y].unit_id = unit.id
+        if unit.type.movement_type == 'walk' then
+            grid[spawn_x][spawn_y].unit_id = unit.id
+        end
 
         next_unit_id += 1
         add(units, unit)
@@ -236,36 +281,10 @@ function update_units()
         end
 
         -- Move the unit according to it's movement_type
-        if unit.move_type then
-            if unit.move_type == 'fly' then
-                move_star_unit(unit)
-            else
-                -- Find path if doesn't have one
-                if unit.path == nil and unit_path_delay <= 0 then
-                    local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
-                    if unit_path then
-                        unit.path = unit_path
-                        unit.path_index = 1
-                        unit_path_delay = 10
-                    end
-                end
-            end
-
-            move_unit_along_path(unit)
-
-        elseif unit.type.movement_type == 'fly' then
-            move_star_unit(unit)
+        if lookup(unit, 'movement_type', unit.type.movement_type) == 'fly' then
+            move_flying_unit(unit)
         else
-            -- Find path if doesn't have one
-            if unit.path == nil and unit_path_delay <= 0 then
-                local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
-                if unit_path then
-                    unit.path = unit_path
-                    unit.path_index = 1
-                    unit_path_delay = 10
-                end
-            end
-            move_unit_along_path(unit)
+            move_walking_unit(unit, unit_path_delay)
         end
 
         -- Custom unit update if it exists
@@ -275,11 +294,12 @@ function update_units()
 
         -- Check if the unit has reached the exit
         if unit.y >= GRID_HEIGHT and unit.x > GRID_WIDTH/2 - 1 and unit.x <= GRID_WIDTH/2 + 1 then
-            if unit.type.damage then
-                lives -= unit.type.damage
-            else
-                lives -= 1
-            end
+            -- if unit.type.damage then
+            --     lives -= unit.type.damage
+            -- else
+            --     lives -= 1
+            -- end
+            lives -= lookup(unit.type, 'damage', 1)
             remove_unit(unit)
 
             if lives <= 0 then
@@ -296,45 +316,6 @@ function remove_unit(unit)
     del(units, unit)
 end
 
--- Determine the next unit type based on probabilities
-function get_next_unit_type()
-    -- Define basic unit probabilities
-    local unit_probs = {
-        {type = unit_types_list['Circle'], prob = 0.3},
-        {type = unit_types_list['Square'], prob = 0.3},
-        {type = unit_types_list['Triangle'], prob = 0.3},
-        {type = unit_types_list['Star'], prob = 0.1}
-    }
-
-    -- Override with boss probabilities for wave 10 and 30
-    if wave_number == 9 or wave_number == 29 then
-        unit_probs = {
-            {type = unit_types_list['Carrier'], prob = 1.0},
-        }
-    -- elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
-    -- wave_number == 23 or wave_number == 27 then
-    --     unit_probs = {
-    --         {type = unit_types_list['Chicken'], prob = 1.0},
-    --     }
-    end
-
-    -- Randomly select unit type based on probabilities
-    local r = rnd(1)
-    local cumulative = 0
-    for i = 1, #unit_probs do
-        cumulative += unit_probs[i].prob
-        if r <= cumulative then
-            return unit_probs[i].type
-        end
-    end
-
-    -- Set chicken deploy
-    if unit_probs[1].type.name == 'Chicken' then
-        chicken_deploy_y = ceil(rnd(GRID_HEIGHT - 3))
-    end
-
-    return unit_probs[1].type -- Default to first type
-end
 
 -- Function to move units along their paths
 function move_unit_along_path(unit)
@@ -375,8 +356,8 @@ function move_unit_along_path(unit)
     end
 end
 
--- Function to move star units
-function move_star_unit(unit)
+-- Function to move flying units
+function move_flying_unit(unit)
     unit.py += unit.type.speed(unit, wave_number) / 15
     if unit.px < (GRID_WIDTH - 1) / 2 * CELL_SIZE then
         unit.px += unit.type.speed(unit, wave_number) / 15
@@ -393,6 +374,20 @@ function move_star_unit(unit)
             game_state = 'defeat'
         end
     end
+end
+
+-- Function to move walking units with path finding
+function move_walking_unit(unit, unit_path_delay)
+    if unit.path == nil and unit_path_delay <= 0 then
+        local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
+        if unit_path then
+            unit.path = unit_path
+            unit.path_index = 1
+            unit_path_delay = 10
+        end
+    end
+    
+    move_unit_along_path(unit)
 end
 
 -- Unit Drawing
