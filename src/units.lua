@@ -102,9 +102,13 @@ unit_types_list['Chicken'] = {
             unit.is_rooster = 0
         end
 
-        local image = 64
-        if unit.flying then
-            image = 80
+        local flip = false
+        local image = 80
+        if not unit.flying then
+            image = 64
+            if flr(unit.lifetime / 12) % 2 == 0 then
+                flip = true
+            end
         end
 
         local flip = false
@@ -112,7 +116,7 @@ unit_types_list['Chicken'] = {
             flip = true
         end
 
-        spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y)
+        spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y, 1, 1, flip)
     end,
     update = function(unit, x, y)
         if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then

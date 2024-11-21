@@ -140,7 +140,8 @@ tower_types = {
 -- Tower Update Functions
 function update_towers()
     -- Don't aquire targets until units have finished spawning
-    if wave_units_to_spawn > 0 then
+    -- Unless it's a chicken
+    if wave_units_to_spawn > 0 and wave_spawning_unit_type.name ~= 'Chicken' then
         return
     end
 
