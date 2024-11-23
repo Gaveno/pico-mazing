@@ -63,16 +63,17 @@ end
 function get_next_unit_type()
     -- Define basic unit probabilities
     local unit_probs = {
-        {type = unit_types_list['Circle'], prob = 0.3},
-        {type = unit_types_list['Square'], prob = 0.3},
-        {type = unit_types_list['Triangle'], prob = 0.3},
-        {type = unit_types_list['Star'], prob = 0.1}
+        {type = unit_types_list['Walker'], prob = 0.3},
+        {type = unit_types_list['Knight'], prob = 0.3},
+        {type = unit_types_list['Lizard'], prob = 0.3},
+        {type = unit_types_list['Bat'], prob = 0.1}
     }
 
     -- Override with boss probabilities for wave 10 and 30
     if wave_number == 9 or wave_number == 29 then
         unit_probs = {
-            {type = unit_types_list['Carrier'], prob = 1.0},
+            {type = unit_types_list['Carrier'], prob = 0.5},
+            {type = unit_types_list['BigBoy'], prob = 0.5},
         }
     -- elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
     -- wave_number == 23 or wave_number == 27 then

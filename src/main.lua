@@ -18,7 +18,7 @@ function _init()
     projectiles = {}
     game_state = 'normal'
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
-    next_unit_type = unit_types_list['Circle']
+    next_unit_type = unit_types_list['Walker']
 
     -- Debug
     -- test_path = find_path(1, 1, GRID_WIDTH / 2, GRID_HEIGHT-1)

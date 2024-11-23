@@ -28,14 +28,14 @@ tower_types = {
     {
         name = 'Triangle',
         cost = 1,
-        attack_type = 2, -- 'pixel_shot',
+        attack_type = 'laser',
         attack_power = 1,
         attack_range = 2 * CELL_SIZE,
-        attack_speed = 30,
+        attack_speed = 35,
         splash = 0,
         projectile_speed = 0,
         proj_launch_x = 3,
-        proj_launch_y = 2,
+        proj_launch_y = 3,
         draw = function(tower, x, y)
             -- Draw Lightning Tower
             local image = 0
@@ -48,7 +48,7 @@ tower_types = {
     {
         name = 'Circle',
         cost = 3,
-        attack_type = 0, --'pixel_shot',
+        attack_type = 'pixel',
         attack_power = 5,
         attack_range = 3 * CELL_SIZE,
         attack_speed = 30,
@@ -67,7 +67,7 @@ tower_types = {
     {
         name = 'Square',
         cost = 4,
-        attack_type = 1, --'bomb',
+        attack_type = 'bomb',
         attack_power = 5,
         attack_range = 4 * CELL_SIZE,
         attack_speed = 50,
@@ -86,7 +86,7 @@ tower_types = {
     {
         name = 'Stacked Circle',
         cost = 6,
-        attack_type = 1, --'bomb',
+        attack_type = 'pixel',
         attack_power = 4,
         attack_range = 4 * CELL_SIZE,
         attack_speed = 15,
@@ -103,7 +103,7 @@ tower_types = {
     {
         name = 'Stacked Triangle',
         cost = 8,
-        attack_type = 2, --'laser',
+        attack_type = 'laser',
         attack_power = 2,
         attack_range = 5 * CELL_SIZE,
         attack_speed = 20,
@@ -122,7 +122,7 @@ tower_types = {
     {
         name = 'Stacked Square',
         cost = 12,
-        attack_type = 1, --'bomb',
+        attack_type = 'bomb',
         attack_power = 8,
         attack_range = 6 * CELL_SIZE,
         attack_speed = 80,
@@ -338,7 +338,7 @@ function draw_tower_menu()
     -- Attack type
     local stat_start_y = y + 1
 
-    if tower_type.attack_type == 2 then
+    if tower_type.attack_type == 'laser' then
         line(x + 2, stat_start_y + 1, x + 6, stat_start_y + 5, 7)
     else
         circ(x + 4, stat_start_y + 2, tower_type.splash, 7)
@@ -359,7 +359,7 @@ function draw_tower_menu()
 
     -- Attack Speed
     local practical_attack_speed = tower_type.attack_speed
-    if tower_type.attack_type == 2 then
+    if tower_type.attack_type == 'laser' then
         practical_attack_speed = practical_attack_speed / 3
     end
 
