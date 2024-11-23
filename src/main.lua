@@ -1,5 +1,6 @@
 -- Variables
-game_state = 'normal' -- 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat'
+game_state = 'title' -- 'title', 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat'
+title_y = 0
 
 
 -- Initialize grid and game elements
@@ -16,9 +17,10 @@ function _init()
     towers = {}
     explosions = {}
     projectiles = {}
-    game_state = 'normal'
+    game_state = 'title'
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
     next_unit_type = unit_types_list['Walker']
+    title_y = -32
 
     -- Debug
     -- test_path = find_path(1, 1, GRID_WIDTH / 2, GRID_HEIGHT-1)
@@ -27,7 +29,9 @@ end
 
 function _update()
     update_cursor()
-    if game_state == 'normal' then
+    if game_state == 'title' then
+        update_title()
+    elseif game_state == 'normal' then
         update_units()
         update_towers()
         update_projectiles()
@@ -41,6 +45,22 @@ function _update()
         if btnp(5) or btnp(4) then
             _init()
         end
+    end
+end
+
+function update_title()
+    if title_y < 30 then
+        title_y += 3
+
+        if btnp(5) or btnp(6) then
+            title_y = 30
+        end
+
+        return
+    end
+
+    if btnp(5) or btnp(6) then
+        game_state = 'normal'
     end
 end
 
@@ -58,8 +78,10 @@ function _draw()
     -- sprr(0, 8, 16, 1)
     -- sprr(0, 8, 24, 2)
     -- sprr(0, 8, 32, 3)
-    
-    if game_state == 'tower_menu' then
+    if game_state == 'title' then
+        draw_title()
+        return
+    elseif game_state == 'tower_menu' then
         draw_tower_menu()
     elseif game_state == 'sell_menu' then
         draw_sell_menu()
@@ -71,6 +93,19 @@ function _draw()
 
     camera()
     draw_hud()
+end
+
+function draw_title()
+    cls(1)
+    camera()
+    palt(0, false)
+    palt(1, true)
+    spr(128, 6, title_y, 15, 4)
+    palt()
+
+    if title_y >= 30 then
+        print("press x or o", 40, 80, 7)
+    end
 end
 
 function draw_victory_screen()
