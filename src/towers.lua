@@ -84,20 +84,36 @@ tower_types = {
         end
     },
     {
-        name = 'Stacked Circle',
+        name = 'QuadPixel',
         cost = 6,
         attack_type = 'pixel',
-        attack_power = 4,
+        attack_power = 2,
         attack_range = 4 * CELL_SIZE,
-        attack_speed = 15,
+        attack_speed = 30,
         splash = 1,
         projectile_speed = 2,
-        proj_launch_x = 3,
-        proj_launch_y = 3,
+        proj_launch_x = 7,
+        proj_launch_y = 7,
         draw = function(tower, x, y)
-            -- Draw yellow circle with white inner circle
-            circfill(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 3, 10) -- Outer circle (Yellow)
-            circfill(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 1, 7)  -- Inner circle (White)
+            local image = 32
+            if tower.cooldown > 8 then
+                image = 33
+            end
+            spr(image, x, y)
+        end,
+        custom_attack = function(tower)
+            -- 4 total projectiles
+            printh("QuadPixel attacking")
+            tower.proj_launch_x = 7
+            tower.proj_launch_y = 7
+            create_projectile(tower, tower.target_unit)
+            tower.proj_launch_x = 0
+            create_projectile(tower, tower.target_unit)
+            tower.proj_launch_y = 0
+            create_projectile(tower, tower.target_unit)
+            tower.proj_launch_x = 7
+            create_projectile(tower, tower.target_unit)
+            printh("QuadPixel done attacking")
         end
     },
     {
@@ -161,7 +177,12 @@ function update_towers()
                 -- printh("tower: "..tower.type.name.." attacking: "..target_unit.type.name)
                 -- printh("("..(tower.x * CELL_SIZE)..","..(tower.y * CELL_SIZE)..") -> ("..target_unit.px..","..target_unit.py..")")
                 tower.cooldown = tower.type.attack_speed
-                create_projectile(tower, tower.target_unit)
+
+                if tower.type.custom_attack then
+                    tower.type.custom_attack(tower)
+                else
+                    create_projectile(tower, tower.target_unit)
+                end
             end
         end
     end

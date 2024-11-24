@@ -10,8 +10,8 @@ function create_projectile(tower, target_unit)
     end
     local projectile = {
         type = tower.type.attack_type,
-        x = (tower.x - 1) * CELL_SIZE + tower.type.proj_launch_x,
-        y = (tower.y - 1) * CELL_SIZE + tower.type.proj_launch_y,
+        x = (tower.x - 1) * CELL_SIZE + lookup(tower, 'proj_launch_x', tower.type.proj_launch_x),
+        y = (tower.y - 1) * CELL_SIZE + lookup(tower, 'proj_launch_y', tower.type.proj_launch_y),
         target = target_unit,
         speed = tower.type.projectile_speed,
         attack_power = tower.type.attack_power,
@@ -71,7 +71,8 @@ function check_projectile_collision(proj)
     if dist <= proj.speed then
         -- Collision occurred
         if proj.splash > 0 then
-            create_explosion(proj.x, proj.y, proj.splash, proj.attack_power)
+            apply_unit_damage(proj)
+            create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
         else
             apply_unit_damage(proj)
         end
@@ -99,7 +100,7 @@ function apply_unit_damage(proj)
 end
 
 -- Function to create an explosion and apply splash damage
-function create_explosion(x, y, radius_cells, attack_power)
+function create_explosion(x, y, radius_cells, attack_power, exclude)
     local explosion = {
         x = x,
         y = y,
@@ -107,19 +108,20 @@ function create_explosion(x, y, radius_cells, attack_power)
         attack_power = attack_power,
         lifetime = 0,
         max_lifetime = 15, -- Adjust duration as needed
-        color = 9 -- Explosion color (red/orange)
+        color = 9, -- Explosion color (red/orange)
     }
     add(explosions, explosion)
 
     -- Apply damage to units within the explosion radius
     for unit in all(units) do
-        local dx = (unit.px + CELL_SIZE / 2) - x
-        local dy = (unit.py + CELL_SIZE / 2) - y
-        local dist = sqrt(dx * dx + dy * dy)
-        if dist <= explosion.radius then
-            local damage = calculate_splash_damage(explosion.radius, dist, attack_power, radius_cells)
-            apply_unit_damage({target = unit, type = 'bomb', attack_power = damage})
-            -- unit.health -= damage
+        if unit ~= exclude then
+            local dx = (unit.px + CELL_SIZE / 2) - x
+            local dy = (unit.py + CELL_SIZE / 2) - y
+            local dist = sqrt(dx * dx + dy * dy)
+            if dist <= explosion.radius then
+                local damage = calculate_splash_damage(explosion.radius, dist, attack_power, radius_cells)
+                apply_unit_damage({target = unit, type = 'bomb', attack_power = damage})
+            end
         end
     end
 end

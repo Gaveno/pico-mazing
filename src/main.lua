@@ -1,6 +1,7 @@
 -- Variables
 game_state = 'title' -- 'title', 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat'
 title_y = 0
+show_game_name = false
 
 
 -- Initialize grid and game elements
@@ -46,20 +47,24 @@ function _update()
             _init()
         end
     end
+
+    if btnp(5) and btnp(4) then
+        show_game_name = (not show_game_name)
+    end
 end
 
 function update_title()
     if title_y < 30 then
         title_y += 3
 
-        if btnp(5) or btnp(6) then
+        if btnp(5) or btnp(4) then
             title_y = 30
         end
 
         return
     end
 
-    if btnp(5) or btnp(6) then
+    if btnp(5) or btnp(4) then
         game_state = 'normal'
     end
 end
@@ -72,6 +77,12 @@ function _draw()
     draw_units()
     draw_projectiles()
     draw_explosions()
+    if show_game_name then
+        palt(0, false)
+        palt(1, true)
+        spr(128, 6, 30, 15, 4)
+        palt()
+    end
     draw_cursor()
 
     -- sprr(0, 8, 8, 0)
@@ -91,8 +102,10 @@ function _draw()
         draw_defeat_screen()
     end
 
-    camera()
-    draw_hud()
+    if not show_game_name then
+        camera()
+        draw_hud()
+    end
 end
 
 function draw_title()

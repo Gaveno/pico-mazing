@@ -401,7 +401,7 @@ function update_units()
         end
 
         -- Check if the unit has reached the exit
-        if unit.y >= GRID_HEIGHT - 1 and unit.x > GRID_WIDTH/2 - 1 and unit.x <= GRID_WIDTH/2 + 1 then
+        if unit.y >= GRID_HEIGHT and unit.x > GRID_WIDTH/2 - 1 and unit.x <= GRID_WIDTH/2 + 1 then
             -- if unit.type.damage then
             --     lives -= unit.type.damage
             -- else

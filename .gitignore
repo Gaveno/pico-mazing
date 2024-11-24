@@ -4,3 +4,5 @@ src/picomazing_*.bin/picomazing_*_raspi.zip
 src/picomazing_*.bin/picomazing_*_windows.zip
 src/*.bin/**
 src/*.p8.png
+*.js
+*.html
