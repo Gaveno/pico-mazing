@@ -1,0 +1,311 @@
+ -- Define the unit types list
+ unit_types_list = {}
+ unit_types_list['Walker'] = {
+     name = 'Walker',
+     type = 'basic',
+     health = function(wave_number) return 6 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
+     movement_type = 'walk',
+     weakness = nil,
+     strength = nil,
+     draw = function(unit, x, y)
+         -- Draw Walker
+         palt(1, true)
+         local flip = false
+         if flr(unit.lifetime / 4) % 2 == 0 then
+             flip = true
+         end
+ 
+         spr(20, x, y, 1, 1, flip, false)
+         palt()
+     end
+ }
+ unit_types_list['Knight'] = {
+     name = 'Knight',
+     type = 'basic',
+     health = function(wave_number) return 8 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
+     movement_type = 'walk',
+     weakness = 'laser',
+     strength = 'bomb',
+     draw = function(unit, x, y)
+         -- Draw Knight Walker
+         palt(1, true)
+         local flip = false
+         if flr(unit.lifetime / 6) % 2 == 0 then
+             flip = true
+         end
+ 
+         spr(21, x, y, 1, 1, flip, false)
+         palt()
+     end
+ }
+ unit_types_list['Lizard'] = {
+     name = 'Lizard',
+     type = 'basic',
+     health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number) return 6 + flr(wave_number / 5) * 2 + flr(wave_number / 10) * 2 end,
+     movement_type = 'walk',
+     weakness = 'pixel',
+     strength = 'laser',
+     draw = function(unit, x, y)
+         -- Draw Lizard
+         local flip = false
+         if flr(unit.lifetime / 10) % 2 == 0 then
+             flip = true
+         end
+ 
+         spr(37 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
+     end
+ }
+ unit_types_list['Bat'] = {
+     name = 'Bat',
+     type = 'basic',
+     health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
+     movement_type = 'fly',
+     weakness = 'bomb',
+     strength = 'pixel',
+     draw = function(unit, x, y)
+         -- Draw bat
+         palt(15, true)
+ 
+         -- Flip sprite
+         local flip = false
+         if flr(unit.lifetime / 8) % 2 == 0 then
+             flip = true
+         end
+ 
+         palt(0, false)
+         spr(24 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
+ 
+         palt()
+     end
+ }
+ unit_types_list['Chicken'] = {
+     name = 'Chicken',
+     type = 'elite',
+     spawn_rate = 30,
+     health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
+     movement_type = 'fly',
+     weakness = 'pixel',
+     strength = 'laser',
+     init = function(unit)
+         printh("Initializing chicken")
+         if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
+         if unit.is_rooster then
+             unit.health = unit.health * 1.4
+         end
+ 
+         unit.fly_duration = 30 + flr(rnd(90))
+         unit.flying = true
+     end,
+     draw = function(unit, x, y)
+         if not unit.is_rooster then
+             unit.is_rooster = 0
+         end
+ 
+         local flip = false
+         local image = 80
+         if not unit.flying then
+             image = 64
+             if flr(unit.lifetime / 12) % 2 == 0 then
+                 flip = true
+             end
+         end
+ 
+         local flip = false
+         if flr(unit.lifetime / 10) % 2 == 0 then
+             flip = true
+         end
+ 
+         spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y, 1, 1, flip)
+     end,
+     update = function(unit, x, y)
+         if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then
+             printh("chicken still flying")
+             unit.py = chicken_deploy_y * CELL_SIZE
+             unit.fly_duration -= 1
+         else
+             if unit.flying then
+                 local land_x = ceil((unit.px) / CELL_SIZE) + 1
+                 local land_y = ceil((unit.py) / CELL_SIZE)
+                 printh("chicken trying to land at: "..land_x..", "..land_y)
+ 
+                 if get_tower_at(land_x, land_y) == nil and grid[land_x][land_y].unit_id == nil then
+                     printh("chicken landing")
+                     unit.flying = false
+                     unit.movement_type = 'walk'
+                     unit.x = land_x
+                     unit.y = land_y
+                 end
+             end
+         end
+ 
+     end
+ }
+ 
+ 
+ -- Bosses
+ -- Carrier - Flies to exit and spawns drones on the way
+ unit_types_list['Carrier'] = {
+     name = 'Carrier',
+     type = 'boss',
+     spawn_number = 1,
+     damage = 6,
+     health = function(wave_number) return 30 * wave_number / 2 + flr(wave_number / 5) * 20 end,
+     speed = function(unit, wave_number)
+         if unit.ability_cooldown < 30 then
+             return 0
+         end
+         return 3
+     end,
+     movement_type = 'fly',
+     weakness = 'bomb',
+     strength = 'pixel',
+     spawn_time = 120, -- 4 seconds
+     draw = function(unit, x, y)
+         -- Draw Carrier next wave image
+         if not unit.ability_cooldown then
+             spr(26, x, y)
+             return
+         end
+ 
+         -- Flip sprite
+         local flip = false
+         -- if flr(unit.lifetime / 16) % 2 == 0 then
+         --     flip = true
+         -- end
+ 
+         if unit.ability_cooldown >= 30 then
+             sspr(88 + (flr(unit.lifetime / 15) % 2) * 16, 0, 16, 16, x - 4, y - 8, 16, 16, flip)
+         else
+             -- Spawning animation
+             sspr(88 + (flr((29 - unit.lifetime) / 15) % 2) * 16, 16, 16, 16, x - 4, y - 8, 16, 16, flip)
+         end
+         -- rect(x, y, x + 7, y + 7, 2)
+     end,
+     update = function(unit)
+         unit.ability_cooldown = (unit.ability_cooldown - 1) % unit.type.spawn_time
+         -- printh("Ability cooldown: "..unit.ability_cooldown)
+ 
+         -- Check for ability to spawn
+         local spawn_x = flr((unit.px + 12) / CELL_SIZE)
+         local spawn_y = flr((unit.py + 16) / CELL_SIZE)
+         if unit.ability_cooldown < 30 and get_tower_at(spawn_x, spawn_y) ~= nil then
+             unit.ability_cooldown = 30
+         end
+ 
+         -- Single frame spawn
+         if unit.ability_cooldown == 15 then
+             spawn_unit(unit_types_list['Drone'], spawn_x, spawn_y)
+         end
+     end,
+ }
+ -- Carrier drone spawn
+ unit_types_list['Drone'] = {
+     name = 'Drone',
+     type = 'spawn',
+     health = function(wave_number) return 1 * wave_number / 2 + flr(wave_number / 5) * 5 end,
+     speed = function(unit, wave_number) return 8 + flr(wave_number / 5) * 2 end,
+     movement_type = 'walk',
+     weakness = nil,
+     strength = nil,
+     draw = function(unit, x, y)
+         -- Draw Drone
+         spr(39 + flr(unit.lifetime / 3) % 2, x, y)
+     end
+ }
+ 
+ -- BigBoy
+ -- Slow massive health pool. Occasionally jumps over a tower directly to it's south
+ unit_types_list['BigBoy'] = {
+     name = 'BigBoy',
+     type = 'boss',
+     spawn_number = 1,
+     damage = 6,
+     health = function(wave_number) return 80 * wave_number / 2 + flr(wave_number / 5) * 50 end,
+     speed = function(unit, wave_number)
+         if unit.movement_type == 'fly' then
+             if unit.ability_cooldown > 25 then
+                 return 0
+             else 
+                 return 10
+             end
+         end
+         
+         return 3 + flr(wave_number / 5) * 2
+     end,
+     init = function(unit)
+         unit.ability_cooldown = 0
+         unit.movement_type = unit.type.movement_type
+     end,
+     movement_type = 'walk',
+     weakness = 'laser',
+     strength = 'bomb',
+     draw = function(unit, x, y)
+         -- Flip sprite
+         local flip = false
+         if flr(unit.lifetime / 16) % 2 == 0 and (not unit.movement_type or unit.movement_type == 'walk') then
+             flip = true
+         end
+ 
+         -- Draw Carrier next wave image
+         if not unit.ability_cooldown then
+             spr(74, x, y)
+             return
+         end
+ 
+         local image = 68
+         if unit.movement_type == 'fly' then
+             if unit.ability_cooldown > 25 then
+                 image = 70
+             elseif unit.ability_cooldown <= 25 then
+                 image = 72
+             end
+         end
+ 
+         spr(image, unit.px - 4, unit.py - 8, 2, 2, flip)
+     end,
+     update = function(unit, x, y)
+         if unit.ability_cooldown > 0 then
+             unit.ability_cooldown -= 1
+         end
+ 
+         if unit.movement_type == 'walk' then
+             if unit.ability_cooldown == 0 then
+                 -- Walking, ready to jump
+                 -- Should have a path to follow
+                 local real_cell = {x = ceil((unit.px + 4) / CELL_SIZE), y = ceil((unit.py + 4) / CELL_SIZE)}
+                 if real_cell.y < GRID_HEIGHT-2 and get_tower_at(real_cell.x, real_cell.y + 2) == nil
+                 and get_tower_at(real_cell.x, real_cell.y + 1) ~= nil then
+                     -- Jump it
+                     unit.ability_cooldown = 50
+                     unit.movement_type = 'fly'
+                     local owned_cell = unit.path[unit.path_index]
+                     grid[owned_cell.x][owned_cell.y].unit_id = nil
+                     printh("BigBoy prepare to jump")
+                 end
+             end
+ 
+         else
+             if unit.ability_cooldown == 0 then
+                 -- Flying over tower
+                 local land_x = ceil((unit.px) / CELL_SIZE)
+                 local land_y = ceil((unit.py + 4) / CELL_SIZE)
+                 printh("BigBoy looking to land, ab: "..unit.ability_cooldown)
+ 
+                 if get_tower_at(land_x, land_y) == nil then
+                     printh("BigBoy landing, ab: "..unit.ability_cooldown)
+                     unit.movement_type = 'walk'
+                     unit.ability_cooldown = 180
+                     unit.x = land_x
+                     unit.y = land_y
+                     unit.path = nil
+                 end
+             end
+         end
+     end,
+ }
+ 

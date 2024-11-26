@@ -10,7 +10,10 @@ __lua__
 #include main.lua
 #include waves.lua
 #include units.lua
+#include unit_types.lua
 #include towers.lua
+#include tower_types.lua
+#include tower_menus.lua
 #include paths.lua
 #include projectiles.lua
 #include extras.lua
