@@ -240,6 +240,7 @@
      init = function(unit)
          unit.ability_cooldown = 0
          unit.movement_type = unit.type.movement_type
+         unit.x_lock = nil
      end,
      movement_type = 'walk',
      weakness = 'laser',
@@ -285,6 +286,7 @@
                      unit.movement_type = 'fly'
                      local owned_cell = unit.path[unit.path_index]
                      grid[owned_cell.x][owned_cell.y].unit_id = nil
+                     unit.x_lock = unit.px
                      printh("BigBoy prepare to jump")
                  end
              end
@@ -292,6 +294,7 @@
          else
              if unit.ability_cooldown == 0 then
                  -- Flying over tower
+                 unit.px = unit.x_lock
                  local land_x = ceil((unit.px) / CELL_SIZE)
                  local land_y = ceil((unit.py + 4) / CELL_SIZE)
                  printh("BigBoy looking to land, ab: "..unit.ability_cooldown)
