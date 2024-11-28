@@ -105,6 +105,7 @@ function _draw()
     if not show_game_name then
         camera()
         draw_hud()
+        draw_boss_healthbar()
     end
 end
 

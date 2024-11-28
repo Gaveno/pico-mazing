@@ -3,7 +3,7 @@ units = {}
 unit_path_delay = 0
 next_unit_id = 0
 chicken_deploy_y = 0
-
+spawned_boss = nil
 
  
  -- Update paths for existing units
@@ -112,6 +112,11 @@ function remove_unit(unit)
     grid[unit.x][unit.y].unit_id = nil
     unit.health = 0
     del(units, unit)
+
+    -- Boss handling
+    if unit == spawned_boss then
+        spawned_boss = nil
+    end
 end
 
 
@@ -195,4 +200,18 @@ function draw_units()
         local y = unit.py
         unit.type.draw(unit, x, y)
     end
+end
+
+-- Draw Boss Healthbar
+function draw_boss_healthbar()
+    if not spawned_boss then
+        return -- No boss spawned
+    end
+
+    if not spawned_boss.health_max then
+        return -- Boss healthbar not drawn
+    end
+
+    local pr = percent_range(spawned_boss.health, 0, spawned_boss.health_max)
+    rectfill(0, HUD_HEIGHT, ceil(SCREEN_WIDTH * pr), HUD_HEIGHT + 4, 8)
 end

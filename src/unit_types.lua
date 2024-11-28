@@ -164,7 +164,11 @@
      movement_type = 'fly',
      weakness = 'bomb',
      strength = 'pixel',
-     spawn_time = 120, -- 4 seconds
+     spawn_time = 100, -- /30 seconds
+     init = function(unit)
+        unit.health_max = unit.health
+        spawned_boss = unit
+     end,
      draw = function(unit, x, y)
          -- Draw Carrier next wave image
          if not unit.ability_cooldown then
@@ -207,7 +211,7 @@
  unit_types_list['Drone'] = {
      name = 'Drone',
      type = 'spawn',
-     health = function(wave_number) return 1 * wave_number / 2 + flr(wave_number / 5) * 5 end,
+     health = function(wave_number) return 2 * wave_number / 2 + flr(wave_number / 5) * 5 end,
      speed = function(unit, wave_number) return 8 + flr(wave_number / 5) * 2 end,
      movement_type = 'walk',
      weakness = nil,
@@ -225,7 +229,7 @@
      type = 'boss',
      spawn_number = 1,
      damage = 6,
-     health = function(wave_number) return 80 * wave_number / 2 + flr(wave_number / 5) * 50 end,
+     health = function(wave_number) return 55 * wave_number / 2 + flr(wave_number / 5) * 50 end,
      speed = function(unit, wave_number)
          if unit.movement_type == 'fly' then
              if unit.ability_cooldown > 25 then
@@ -235,12 +239,14 @@
              end
          end
          
-         return 3 + flr(wave_number / 5) * 2
+         return 2 + flr(wave_number / 5) * 2
      end,
      init = function(unit)
          unit.ability_cooldown = 0
          unit.movement_type = unit.type.movement_type
          unit.x_lock = nil
+         unit.health_max = unit.health
+         spawned_boss = unit
      end,
      movement_type = 'walk',
      weakness = 'laser',
@@ -292,9 +298,9 @@
              end
  
          else
-             if unit.ability_cooldown == 0 then
+            unit.px = unit.x_lock
+            if unit.ability_cooldown == 0 then
                  -- Flying over tower
-                 unit.px = unit.x_lock
                  local land_x = ceil((unit.px) / CELL_SIZE)
                  local land_y = ceil((unit.py + 4) / CELL_SIZE)
                  printh("BigBoy looking to land, ab: "..unit.ability_cooldown)
