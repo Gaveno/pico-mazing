@@ -93,7 +93,8 @@ function get_next_unit_type()
 
     -- Set chicken deploy
     if unit_probs[1].type.name == 'Chicken' then
-        chicken_deploy_y = 6 + ceil(rnd(GRID_HEIGHT - 10))
+        chicken_deploy_y = 8
+        chcken_deploy_y = chicken_deploy_y + ceil(rnd(GRID_HEIGHT - 3 - chicken_deploy_y))
     end
 
     -- Randomly select unit type based on probabilities

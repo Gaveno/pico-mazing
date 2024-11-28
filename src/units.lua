@@ -18,13 +18,10 @@ function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
 
-
     if unit_type.name == 'Chicken' then
         spawn_y = chicken_deploy_y
         spawn_x = 1
     end
-
-    printh("unit type: "..unit_type.name.." spawn y: "..spawn_y.." spawn x: "..spawn_x)
 
     if grid[spawn_x][spawn_y].unit_id == nil then
 

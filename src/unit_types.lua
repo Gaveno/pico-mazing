@@ -108,20 +108,19 @@
  unit_types_list['Chicken'] = {
      name = 'Chicken',
      type = 'elite',
-     spawn_rate = 30,
-     health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     spawn_rate = 20,
+     health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
      speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
      movement_type = 'fly',
      weakness = 'pixel',
      strength = 'laser',
      init = function(unit)
-         printh("Initializing chicken")
          if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
          if unit.is_rooster then
              unit.health = unit.health * 1.4
          end
  
-         unit.fly_duration = 30 + flr(rnd(90))
+         unit.fly_duration = 30 + rnd(30)
          unit.flying = true
      end,
      draw = function(unit, x, y)
@@ -147,17 +146,14 @@
      end,
      update = function(unit, x, y)
          if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then
-             printh("chicken still flying")
              unit.py = chicken_deploy_y * CELL_SIZE
              unit.fly_duration -= 1
          else
              if unit.flying then
                  local land_x = ceil((unit.px) / CELL_SIZE) + 1
                  local land_y = ceil((unit.py) / CELL_SIZE)
-                 printh("chicken trying to land at: "..land_x..", "..land_y)
  
                  if get_tower_at(land_x, land_y) == nil and grid[land_x][land_y].unit_id == nil then
-                     printh("chicken landing")
                      unit.flying = false
                      unit.movement_type = 'walk'
                      unit.x = land_x
