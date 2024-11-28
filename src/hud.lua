@@ -28,15 +28,17 @@ function draw_hud()
         diamond_wave = (diamond_wave + 1) % 100
     end
 
-    for i = 1, min(diamonds+1, 19) do
-        local di = (i - 1) % 9
-        local dx = di * 8 --+ di
-        local dy = ceil(i / 9 - 1) * 8
-        if tower_cost ~= 0 and i-1 <= tower_cost then
+    local total = min(diamonds, 15)
+
+    for i = 0, total do
+        local di = i % 8
+        local dx = 8 + di * 8 --+ di
+        local dy = flr(i / 8) * 8
+        if tower_cost ~= 0 and tower_cost > diamonds-i or i == 15 then
             dy += sin((diamond_wave - i) % 10 / 10)
         end
 
-        if i == 18 and diamonds+1 >= 19 then
+        if i == 15 and diamonds > 15 then
             spr(23, SCREEN_WIDTH - dx, dy)
         else
             spr(7, SCREEN_WIDTH - dx, dy) -- Diamond
