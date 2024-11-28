@@ -31,7 +31,7 @@ function update_waves()
     end
 
     -- Check if game has been won
-    if wave_number > 30 and #units == 0 then
+    if wave_number > 30 and #units == 0 and game_state == 'normal' then
         game_state = 'victory'
     end
 

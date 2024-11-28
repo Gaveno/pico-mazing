@@ -70,7 +70,7 @@ function sell_tower(x, y)
     local tower = get_tower_at(x, y)
     if tower then
         -- Refund diamonds
-        local refund = flr(tower.type.cost * 0.75)
+        local refund = ceil(tower.type.cost * 0.75)
         diamonds += refund
 
         -- Remove tower
@@ -192,11 +192,6 @@ function draw_tower_menu()
     spr(10, x + POPUP_MENU_WIDTH/2 - 6, y + POPUP_MENU_HEIGHT + 2, 1, 1, false, true)
     spr(10, x + POPUP_MENU_WIDTH/2 + 2, y + POPUP_MENU_HEIGHT + 2, 1, 1, true, true)
     pal()
-
-    -- Buttons
-    -- spr(16, x + 2, y + POPUP_MENU_HEIGHT - 1)
-    -- spr(17, x + POPUP_MENU_WIDTH - 10, y + POPUP_MENU_HEIGHT - 1)
-
 end
 
 function draw_sell_menu()
@@ -211,12 +206,8 @@ function draw_sell_menu()
     tower.type.draw({cooldown = 0, type = tower.type}, x + 2, y + 2)
 
     -- Draw sell price
-    local refund = flr(tower.type.cost * 0.75)
+    local refund = ceil(tower.type.cost * 0.75)
     for i = 1, refund do
         spr(7, x + 12 + (i - 1) * 8, y + 2)
     end
-
-    -- Buttons
-    -- spr(16, x + 2, y + POPUP_MENU_HEIGHT - 1)
-    -- spr(17, x + POPUP_MENU_WIDTH - 10, y + POPUP_MENU_HEIGHT - 1)
 end

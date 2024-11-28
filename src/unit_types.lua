@@ -254,7 +254,7 @@
      type = 'boss',
      spawn_number = 1,
      damage = 6,
-     health = function(wave_number) return 55 * wave_number / 2 + flr(wave_number / 5) * 50 end,
+     health = function(wave_number) return 55 * wave_number / 2 + flr(wave_number / 5) * 70 end,
      reward = 6,
      speed = function(unit, wave_number)
          if unit.movement_type == 'fly' then

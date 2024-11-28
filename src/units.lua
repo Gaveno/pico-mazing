@@ -73,7 +73,7 @@ function update_units()
         -- Check life and terminate early if a unit dies
         -- Should be fine because every unit doesn't have to update each frame
         if unit.health <= 0 then
-            diamonds += lookup(unit, 'reward', 1)
+            diamonds += lookup(unit.type, 'reward', 1)
             remove_unit(unit)
             return
         end
@@ -92,11 +92,6 @@ function update_units()
 
         -- Check if the unit has reached the exit
         if unit.y >= GRID_HEIGHT and unit.x > GRID_WIDTH/2 - 1 and unit.x <= GRID_WIDTH/2 + 1 then
-            -- if unit.type.damage then
-            --     lives -= unit.type.damage
-            -- else
-            --     lives -= 1
-            -- end
             lives -= lookup(unit.type, 'damage', 1)
             remove_unit(unit)
 
@@ -145,7 +140,6 @@ function move_unit_along_path(unit)
         local next_cell = unit.path[unit.path_index + 1]
         if grid[next_cell.x][next_cell.y].unit_id == nil then
             -- Empty previous cell and update to next target
-            -- printh("unit "..unit.id.." arrived at ("..target_cell.x..","..target_cell.y.."), moving to ("..next_cell.x..","..next_cell.y..")")
             grid[target_cell.x][target_cell.y].unit_id = nil
             unit.x = next_cell.x
             unit.y = next_cell.y
