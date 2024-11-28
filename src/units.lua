@@ -73,8 +73,8 @@ function update_units()
         -- Check life and terminate early if a unit dies
         -- Should be fine because every unit doesn't have to update each frame
         if unit.health <= 0 then
+            diamonds += lookup(unit, 'reward', 1)
             remove_unit(unit)
-            diamonds += 1
             return
         end
 
@@ -172,7 +172,7 @@ function move_flying_unit(unit)
 
     if unit.py >= ((GRID_HEIGHT - 1) * CELL_SIZE) then
         del(units, unit)
-        lives -= 1
+        lives -= lookup(unit.type, 'damage', 1)
         if lives <= 0 then
             game_state = 'defeat'
         end

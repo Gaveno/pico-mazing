@@ -6,7 +6,12 @@ wave_number = 1
 wave_timer = WAVE_PREP_TIME + 10
 wave_units_to_spawn = 0
 wave_spawning_unit_type = nil
+wave_is_elite = false
 chicken_spawn_delay = 0
+
+-- Wave variables
+boss_waves = {10, 30}
+elite_waves = {7, 13, 19, 23, 27}
 
 -- Update wave timing and spawning units
 function update_waves()
@@ -46,6 +51,7 @@ end
 
 -- Start a new wave of units
 function start_wave()
+    wave_is_elite = (contains(elite_waves, wave_number))
     wave_units_to_spawn = get_wave_unit_total(wave_number)
     wave_spawning_unit_type = next_unit_type
     -- Bosses have their own fixed number of spawns
@@ -61,33 +67,33 @@ end
 
 -- Determine the next unit type based on probabilities
 function get_next_unit_type()
+    local next_wave = wave_number + 1
+
     -- Define basic unit probabilities
     local unit_probs = {
-        {type = unit_types_list['Walker'], prob = 0.3},
-        {type = unit_types_list['Knight'], prob = 0.3},
-        {type = unit_types_list['Lizard'], prob = 0.3},
-        {type = unit_types_list['Bat'], prob = 0.1}
+        {type = unit_types_list['Walker'], prob = 0.30},
+        {type = unit_types_list['Knight'], prob = 0.25},
+        {type = unit_types_list['Lizard'], prob = 0.25},
+        {type = unit_types_list['Bat'], prob = 0.20}
     }
 
     -- Override with boss probabilities for wave 10 and 30
-    if wave_number == 9 or wave_number == 29 then
+    if contains(boss_waves, next_wave) then
         unit_probs = {
             {type = unit_types_list['Carrier'], prob = 0.5},
             {type = unit_types_list['BigBoy'], prob = 0.5},
         }
-    -- elseif wave_number == 1 or wave_number == 7 or wave_number == 13 or wave_number == 19 or
-    -- wave_number == 23 or wave_number == 27 then
-    elseif wave_number == 19 or wave_number == 27 then
+    elseif contains(elite_waves, next_wave) then
         unit_probs = {
-            {type = unit_types_list['Chicken'], prob = 1.0},
+            {type = unit_types_list['Chicken'], prob = 0.34},
+            {type = unit_types_list['Lizard'], prob = 0.33},
+            {type = unit_types_list['Knight'], prob = 0.33},
         }
     end
 
     -- Set chicken deploy
-    printh("unit type: "..unit_probs[1].type.name)
     if unit_probs[1].type.name == 'Chicken' then
         chicken_deploy_y = 6 + ceil(rnd(GRID_HEIGHT - 10))
-        -- printh("chicken_deploy_y: "..chicken_deploy_y)
     end
 
     -- Randomly select unit type based on probabilities

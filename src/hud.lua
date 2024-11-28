@@ -28,13 +28,13 @@ function draw_hud()
         diamond_wave = (diamond_wave + 1) % 100
     end
 
-    local total = min(diamonds, 15)
+    local total = min(diamonds-1, 15)
 
     for i = 0, total do
         local di = i % 8
         local dx = 8 + di * 8 --+ di
         local dy = flr(i / 8) * 8
-        if tower_cost ~= 0 and tower_cost > diamonds-i or i == 15 then
+        if tower_cost ~= 0 and tower_cost >= diamonds-i or i == 15 then
             dy += sin((diamond_wave - i) % 10 / 10)
         end
 
@@ -68,8 +68,10 @@ function draw_hud()
     spr(8, hourglass_x, 8, 1, 1, false, true)
 
     -- Draw next unit info
-    if wave_number < 30 then
+    if wave_number <= 30 then
+        wave_is_elite = (contains(elite_waves, wave_number))
         next_unit_type.draw({lifetime = wave_timer}, 28, 0)
+        wave_is_elite = (contains(elite_waves, wave_number-1))
         print("x"..(get_wave_unit_total(wave_number)), 38, 2, 7)
         spr(9, 28, 8)
         print(wave_number, 38, 11, 7)

@@ -21,14 +21,20 @@
      end
  }
  unit_types_list['Knight'] = {
-     name = 'Knight',
-     type = 'basic',
-     health = function(wave_number) return 8 * wave_number / 2 + flr(wave_number / 5) * 2 end,
-     speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
-     movement_type = 'walk',
-     weakness = 'laser',
-     strength = 'bomb',
-     draw = function(unit, x, y)
+    name = 'Knight',
+    type = 'basic',
+    health = function(wave_number) return 8 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+    speed = function(unit, wave_number)
+        local base = 4
+        if wave_is_elite then
+            base += 2
+        end
+        return base + flr(wave_number / 5) * 2
+    end,
+    movement_type = 'walk',
+    weakness = 'laser',
+    strength = 'bomb',
+    draw = function(unit, x, y)
          -- Draw Knight Walker
          palt(1, true)
          local flip = false
@@ -36,14 +42,25 @@
              flip = true
          end
  
+         if wave_is_elite then
+            pal({[10]=11, [4]=12})
+         end
+
          spr(21, x, y, 1, 1, flip, false)
+         pal()
          palt()
      end
  }
  unit_types_list['Lizard'] = {
      name = 'Lizard',
      type = 'basic',
-     health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+     health = function(wave_number)
+        local base = 5
+        if wave_is_elite then
+            base += 2
+        end
+        return base * wave_number / 2 + flr(wave_number / 5) * 2
+    end,
      speed = function(unit, wave_number) return 6 + flr(wave_number / 5) * 2 + flr(wave_number / 10) * 2 end,
      movement_type = 'walk',
      weakness = 'pixel',
@@ -54,8 +71,14 @@
          if flr(unit.lifetime / 10) % 2 == 0 then
              flip = true
          end
+
+         -- Draw elite version
+         if wave_is_elite then
+            pal({[11]=8, [3]=4, [8]=11})
+         end
  
          spr(37 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
+         pal()
      end
  }
  unit_types_list['Bat'] = {
@@ -116,7 +139,7 @@
          end
  
          local flip = false
-         if flr(unit.lifetime / 10) % 2 == 0 then
+         if flr(unit.lifetime / 10) % 2 == 0 and not unit.flying then
              flip = true
          end
  
@@ -155,6 +178,7 @@
      spawn_number = 1,
      damage = 6,
      health = function(wave_number) return 30 * wave_number / 2 + flr(wave_number / 5) * 20 end,
+     reward = 6,
      speed = function(unit, wave_number)
          if unit.ability_cooldown < 30 then
              return 0
@@ -212,6 +236,7 @@
      name = 'Drone',
      type = 'spawn',
      health = function(wave_number) return 2 * wave_number / 2 + flr(wave_number / 5) * 5 end,
+     reward = 0,
      speed = function(unit, wave_number) return 8 + flr(wave_number / 5) * 2 end,
      movement_type = 'walk',
      weakness = nil,
@@ -230,6 +255,7 @@
      spawn_number = 1,
      damage = 6,
      health = function(wave_number) return 55 * wave_number / 2 + flr(wave_number / 5) * 50 end,
+     reward = 6,
      speed = function(unit, wave_number)
          if unit.movement_type == 'fly' then
              if unit.ability_cooldown > 25 then
