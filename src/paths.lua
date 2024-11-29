@@ -1,62 +1,92 @@
 -- Implementing A* Pathfinding
 
-function find_path(start_x, start_y, goal_x, goal_y)
-    local open_list = {}
-    local closed_list = {}
-    local came_from = {}
+function find_path_coroutine(start_x, start_y, goal_x, goal_y)
+    return cocreate(function()
+        local open_list = {}
+        local closed_list = {}
+        local came_from = {}
 
-    local start_node = {x = start_x, y = start_y, g = 0, h = heuristic(start_x, start_y, goal_x, goal_y), f = 0}
-    start_node.f = start_node.g + start_node.h
-    add(open_list, start_node)
+        local start_node = {
+            x = start_x,
+            y = start_y,
+            g = 0,
+            h = heuristic(start_x, start_y, goal_x, goal_y),
+            f = 0
+        }
+        start_node.f = start_node.g + start_node.h
+        add(open_list, start_node)
 
-    while #open_list > 0 do
-        -- Find node in open_list with lowest f
-        local current_index = 1
-        local current_node = open_list[1]
-        for i, node in ipairs(open_list) do
-            if node.f < current_node.f then
-                current_node = node
-                current_index = i
+        while #open_list > 0 do
+            -- Find node in open_list with lowest f
+            local current_node = open_list[1]
+            for i, node in ipairs(open_list) do
+                if node.f < current_node.f then
+                    current_node = node
+                end
             end
-        end
 
-        del(open_list, current_node)
-        add(closed_list, current_node)
+            del(open_list, current_node)
+            add(closed_list, current_node)
 
-        if current_node.x == goal_x and current_node.y == goal_y then
-            -- Reconstruct path
-            local path = {}
-            local current = current_node
-            while current do
-                add(path, {x = current.x, y = current.y}, 1)
-                current = came_from[current.x .. ',' .. current.y]
+            if current_node.x == goal_x and current_node.y == goal_y then
+                -- Reconstruct path
+                local path = {}
+                local current = current_node
+                while current do
+                    add(path, {x = current.x, y = current.y}, 1)
+                    current = came_from[current.x .. ',' .. current.y]
+                end
+                yield(path) -- Yield the path
+                return
             end
-            return path
-        end
 
-        -- Get neighbors
-        local neighbors = get_neighbors(current_node.x, current_node.y)
-        for _, neighbor in ipairs(neighbors) do
-            if not in_list(closed_list, neighbor.x, neighbor.y) then
-                local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.4142
-                local tentative_g = current_node.g + movement_cost
-                local neighbor_in_open = in_open_list(open_list, neighbor.x, neighbor.y)
-                if not neighbor_in_open or tentative_g < neighbor_in_open.g then
-                    came_from[neighbor.x .. ',' .. neighbor.y] = current_node
-                    neighbor.g = tentative_g
-                    neighbor.h = heuristic(neighbor.x, neighbor.y, goal_x, goal_y)
-                    neighbor.f = neighbor.g + neighbor.h
-                    if not neighbor_in_open then
-                        add(open_list, neighbor)
+            -- Get neighbors
+            local neighbors = get_neighbors(current_node.x, current_node.y)
+            for _, neighbor in ipairs(neighbors) do
+                if not in_list(closed_list, neighbor.x, neighbor.y) then
+                    local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.4142
+                    local tentative_g = current_node.g + movement_cost
+                    local neighbor_in_open = in_open_list(open_list, neighbor.x, neighbor.y)
+                    if not neighbor_in_open or tentative_g < neighbor_in_open.g then
+                        came_from[neighbor.x .. ',' .. neighbor.y] = current_node
+                        neighbor.g = tentative_g
+                        neighbor.h = heuristic(neighbor.x, neighbor.y, goal_x, goal_y)
+                        neighbor.f = neighbor.g + neighbor.h
+                        if not neighbor_in_open then
+                            add(open_list, neighbor)
+                        end
                     end
                 end
             end
+
+            yield() -- Yield control back to the main loop
         end
-        
+
+        -- No path found
+        yield(nil)
+    end)
+end
+
+-- Returns the path coroutine and the result
+function process_path_coroutine(path_co)
+    if not path_co then
+        return nil, nil
     end
 
-    -- No path found
-    return nil
+    local status, result = coresume(path_co)
+    if not status then
+        -- error handling
+        printh("Pathfinding error")
+        return nil, nil
+    elseif result ~= nil then
+        -- Coroutine yielded a result (the path)
+        return nil, result
+    elseif costatus(path_co) == "dead" then
+        -- Coroutine finished without finding a path
+        return nil, nil
+    end
+
+    return path_co, nil
 end
 
 function heuristic(x1, y1, x2, y2)
