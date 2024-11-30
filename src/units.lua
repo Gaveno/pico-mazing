@@ -30,6 +30,7 @@ function spawn_unit(unit_type, x, y)
             y = spawn_y,
             px = (spawn_x - 1) * CELL_SIZE,
             py = (spawn_y - 1) * CELL_SIZE,
+            path_coroutine = nil,
             path = nil, -- path,
             path_index = 2,
             type = unit_type,
@@ -172,13 +173,16 @@ end
 
 -- Function to move walking units with path finding
 function move_walking_unit(unit, unit_path_delay)
-    if unit.path == nil and unit_path_delay <= 0 then
-        local unit_path = find_path(unit.x, unit.y, EXIT_X, EXIT_Y)
-        if unit_path then
-            unit.path = unit_path
-            unit.path_index = 1
-            unit_path_delay = 10
-        end
+    -- Start finding path
+    if unit.path_coroutine == nil and unit.path == nil and unit_path_delay <= 0 then
+        unit.path_coroutine = find_path_coroutine(unit.x, unit.y, EXIT_X, EXIT_Y)
+        unit_path_delay = 3
+        unit.path_index = 1 -- Start at beginning of path once found
+    end
+
+    -- Keep processing path
+    if unit.path_coroutine ~= nil and unit.path == nil then
+        unit.path_coroutine, unit.path = process_path_coroutine(unit.path_coroutine)
     end
     
     move_unit_along_path(unit)

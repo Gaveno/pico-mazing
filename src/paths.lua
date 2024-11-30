@@ -1,5 +1,9 @@
 -- Implementing A* Pathfinding
 
+-- Call find_path_coroutine to get the coroutine
+-- follow up call with process_path_coroutine until the
+-- first argument is nil and the second has the resulting path
+-- The first argument returned is the coroutine
 function find_path_coroutine(start_x, start_y, goal_x, goal_y)
     return cocreate(function()
         local open_list = {}
@@ -44,7 +48,7 @@ function find_path_coroutine(start_x, start_y, goal_x, goal_y)
             local neighbors = get_neighbors(current_node.x, current_node.y)
             for _, neighbor in ipairs(neighbors) do
                 if not in_list(closed_list, neighbor.x, neighbor.y) then
-                    local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.4142
+                    local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.2 --1.4142
                     local tentative_g = current_node.g + movement_cost
                     local neighbor_in_open = in_open_list(open_list, neighbor.x, neighbor.y)
                     if not neighbor_in_open or tentative_g < neighbor_in_open.g then
@@ -59,7 +63,9 @@ function find_path_coroutine(start_x, start_y, goal_x, goal_y)
                 end
             end
 
-            yield() -- Yield control back to the main loop
+            if #open_list % 4 == 0 then
+                yield() -- Yield control back to the main loop
+            end
         end
 
         -- No path found

@@ -76,5 +76,5 @@ end
 
 
 function get_tower_at(x, y)
-    return towers[x..","..y]
+    return towers[x..','..y]
 end

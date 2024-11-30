@@ -1,5 +1,11 @@
+-- Variables
+building_coroutine = nil -- trying to find path when not nil
+found_build_path = false
+
 -- Update tower menu interactions
 function update_tower_menu()
+    process_tower_build_path(building_coroutine)
+
     if tower_menu_open_delay > 0 then
         tower_menu_open_delay -= 1
         return
@@ -52,6 +58,7 @@ end
 function build_tower(x, y, tower_type)
     -- Update grid and unit paths
     -- grid[x][y] = false
+    sfx(0, 0, 0, 8) -- build sound
     update_unit_paths()
 
     -- Place the tower
@@ -94,15 +101,32 @@ function can_build_tower_at(x, y)
         }
         local spawn_x = flr(GRID_WIDTH / 2)
         local spawn_y = 1
-        local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
-        -- printh("Path length: "..#path)
-        towers[x .. ',' .. y] = nil
-        if path then
-            return true
-        end
+        -- local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
+        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y)
+        found_build_path = false
+    else
+        game_state = 'normal'
     end
     printh("Could not build tower at ("..x..","..y..")")
-    return false
+end
+
+-- Keep processing build attempt
+function process_tower_build_path(path_co)
+    if not found_build_path then
+        if building_coroutine ~= nil then
+            local path = nil
+            building_coroutine, path = process_path_coroutine(building_coroutine)
+
+            if path ~= nil then
+                towers[cursor.x .. ',' .. cursor.y] = nil
+                found_build_path = true
+            end
+        else
+            cursor_cannot_build_timer = 30
+            game_state = 'normal'
+            towers[cursor.x .. ',' .. cursor.y] = nil
+        end
+    end
 end
 
 -- Tower Draw Functions
@@ -115,6 +139,10 @@ function draw_towers()
 end
 
 function draw_tower_menu()
+    if building_coroutine ~= nil then
+        return
+    end
+
     local cursor_y = -1
     if cursor.y <= 8 then
         cursor_y = 6
