@@ -120,6 +120,7 @@ function move_unit_along_path(unit)
     end
 
     if unit.path_index > #unit.path then
+        unit.path = nil
         return
     end
 
@@ -184,8 +185,8 @@ function move_walking_unit(unit, unit_path_delay)
         unit.path_coroutine = find_path_coroutine(
             unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
         )
-        unit_path_delay = 3
-        unit.path_index = 1 -- Start at beginning of path once found
+        unit_path_delay = 10
+        unit.path_index = 2 -- Start at beginning of path once found
     end
 
     -- Keep processing path
