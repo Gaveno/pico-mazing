@@ -4,7 +4,8 @@
 -- follow up call with process_path_coroutine until the
 -- first argument is nil and the second has the resulting path
 -- The first argument returned is the coroutine
-function find_path_coroutine(start_x, start_y, goal_x, goal_y)
+function find_path_coroutine(start_x, start_y, goal_x, goal_y, max_iterations)
+    m = (max_iterations or 4)
     return cocreate(function()
         local open_list = {}
         local closed_list = {}
@@ -63,7 +64,7 @@ function find_path_coroutine(start_x, start_y, goal_x, goal_y)
                 end
             end
 
-            if #open_list % 4 == 0 then
+            if #open_list % m == 0 then
                 yield() -- Yield control back to the main loop
             end
         end

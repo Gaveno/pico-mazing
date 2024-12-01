@@ -5,6 +5,9 @@ found_build_path = false
 -- Update tower menu interactions
 function update_tower_menu()
     process_tower_build_path(building_coroutine)
+    if building_coroutine ~= nil then
+        return
+    end
 
     if tower_menu_open_delay > 0 then
         tower_menu_open_delay -= 1
@@ -102,10 +105,11 @@ function can_build_tower_at(x, y)
         local spawn_x = flr(GRID_WIDTH / 2)
         local spawn_y = 1
         -- local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
-        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y)
+        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y, 10)
         found_build_path = false
     else
         game_state = 'normal'
+        cursor_cannot_build_timer = 30
     end
     printh("Could not build tower at ("..x..","..y..")")
 end
@@ -140,6 +144,10 @@ end
 
 function draw_tower_menu()
     if building_coroutine ~= nil then
+        local x = (cursor.x - 1) * CELL_SIZE
+        local y = (cursor.y - 1) * CELL_SIZE
+        rectfill(x, y, x + CELL_SIZE - 1, y + CELL_SIZE - 1, 1)
+        circ(x + CELL_SIZE / 2, y + CELL_SIZE / 2, cursor_size % 4, 12)
         return
     end
 

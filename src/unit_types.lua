@@ -114,6 +114,7 @@
      movement_type = 'fly',
      weakness = 'pixel',
      strength = 'laser',
+     path_iterations = 10,
      init = function(unit)
          if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
          if unit.is_rooster then
@@ -237,6 +238,7 @@
      movement_type = 'walk',
      weakness = nil,
      strength = nil,
+     path_iterations = 10,
      draw = function(unit, x, y)
          -- Draw Drone
          spr(39 + flr(unit.lifetime / 3) % 2, x, y)
