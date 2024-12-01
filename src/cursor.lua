@@ -35,14 +35,10 @@ function update_cursor()
                 tower_menu_open_delay = 5
             end
         elseif btnp(5) then -- Button X (typically X key)
-            if can_build_tower_at(cursor.x, cursor.y) then
-                game_state = 'tower_menu'
-                tower_menu_index = 1
-                tower_menu_open_delay = 5
-            else
-                -- Cannot build here
-                cursor_cannot_build_timer = 30
-            end
+            game_state = 'tower_menu'
+            tower_menu_index = 1
+            tower_menu_open_delay = 5
+            can_build_tower_at(cursor.x, cursor.y)
         end
     end
 
