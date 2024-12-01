@@ -62,7 +62,7 @@ function build_tower(x, y, tower_type)
     -- Update grid and unit paths
     -- grid[x][y] = false
     sfx(0, 0, 0, 8) -- build sound
-    update_unit_paths()
+    -- update_unit_paths()
 
     -- Place the tower
     towers[x .. ',' .. y] = {
@@ -146,8 +146,8 @@ function draw_tower_menu()
     if building_coroutine ~= nil then
         local x = (cursor.x - 1) * CELL_SIZE
         local y = (cursor.y - 1) * CELL_SIZE
-        rectfill(x, y, x + CELL_SIZE - 1, y + CELL_SIZE - 1, 1)
-        circ(x + CELL_SIZE / 2, y + CELL_SIZE / 2, cursor_size % 4, 12)
+        rectfill(x, y, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 1)
+        circ(x + CELL_SIZE / 2 - 1, y + CELL_SIZE / 2 - 1, cursor_size % 5, 12)
         return
     end
 

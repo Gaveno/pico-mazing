@@ -124,6 +124,12 @@ function move_unit_along_path(unit)
     end
 
     local target_cell = unit.path[unit.path_index]
+    if get_tower_at(target_cell.x, target_cell.y) then
+        -- Invalidate path if blocked
+        unit.path = nil
+        return
+    end
+
     local target_px = (target_cell.x - 1) * CELL_SIZE
     local target_py = (target_cell.y - 1) * CELL_SIZE
 
