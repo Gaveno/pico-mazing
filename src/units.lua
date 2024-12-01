@@ -180,9 +180,11 @@ function check_invalid_path(unit)
     -- If already looking for a path, wipe out progess
     unit.path_coroutine = nil
 
+    printh("-- Checking a path --")
     for i = unit.path_index + 1, #unit.path, 1 do
         local node = unit.path[i]
         if get_tower_at(node.x, node.y) ~= nil then
+            printh("Non-diagonal node invalid: " .. i)
             unit.path_invalid_node = i
             return
         else
@@ -191,12 +193,14 @@ function check_invalid_path(unit)
             if prev_node.x ~= node.x and prev_node.y ~= node.y then
                 -- Is a diagonal
                 if get_tower_at(prev_node.x, node.y) ~= nil or get_tower_at(node.x, prev_node.y) ~= nil then
+                    printh("Diagonal node invalid: " .. i)
                     unit.path_invalid_node = i
                     return
                 end
             end
         end
     end
+    printh("-- Path has not been invalidated --")
 end
 
 -- Function to move flying units
@@ -226,7 +230,7 @@ end
 -- Function to move walking units with path finding
 function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
-    if unit.path_coroutine == nil and unit.path == nil and unit_path_delay <= 0 then
+    if ((unit.path_coroutine == nil and unit.path == nil) or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
         unit.path_coroutine = find_path_coroutine(
             unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
         )
@@ -234,7 +238,7 @@ function move_walking_unit(unit, unit_path_delay)
     end
 
     -- Keep processing path
-    if unit.path_coroutine ~= nil and unit.path == nil then
+    if unit.path_coroutine ~= nil then
         local new_path = nil
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
