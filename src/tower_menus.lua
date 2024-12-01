@@ -73,6 +73,7 @@ function build_tower(x, y, tower_type)
         target_unit = nil
     }
     diamonds -= tower_type.cost
+    check_invalid_nodes = true
 end
 
 -- Function to sell a tower at a specific location

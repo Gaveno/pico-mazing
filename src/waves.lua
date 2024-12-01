@@ -3,10 +3,11 @@ WAVE_PREP_TIME = 15 * 30 -- 15 seconds (PICO-8 runs at 30 FPS)
 
 -- Variables
 wave_number = 1
-wave_timer = WAVE_PREP_TIME + 10
+wave_timer = WAVE_PREP_TIME
 wave_units_to_spawn = 0
 wave_spawning_unit_type = nil
 wave_is_elite = false
+wave_running = false
 chicken_spawn_delay = 0
 
 -- Wave variables
@@ -20,6 +21,10 @@ function update_waves()
         if wave_spawning_unit_type.name == 'Chicken' and chicken_spawn_delay > 0 then
             chicken_spawn_delay -= 1
         else
+            if wave_spawning_unit_type.name == 'Chicken' and not wave_running then
+                return -- Don't prespawn chickens
+            end
+
             chicken_spawn_delay = unit_types_list['Chicken'].spawn_rate
             printh("Attempting to spawn: "..wave_spawning_unit_type.name)
             local spawned_unit = spawn_unit(wave_spawning_unit_type)
@@ -35,8 +40,8 @@ function update_waves()
         game_state = 'victory'
     end
 
-    -- If no units left in wave, countdown timer
-    if #units == 0 and wave_units_to_spawn == 0 and wave_timer > 0 then
+    -- Countdown timer if the wave is no longer running
+    if not wave_running and wave_timer > 0 then
         wave_timer -= 1
     end
 
@@ -49,16 +54,22 @@ function update_waves()
     end
 end
 
--- Start a new wave of units
-function start_wave()
-    wave_is_elite = (contains(elite_waves, wave_number))
+-- Prepare the wave by prespawning units
+function prep_wave()
     wave_units_to_spawn = get_wave_unit_total(wave_number)
+    wave_is_elite = (contains(elite_waves, wave_number))
     wave_spawning_unit_type = next_unit_type
+
     -- Bosses have their own fixed number of spawns
     if wave_spawning_unit_type.type == 'boss' then
         wave_units_to_spawn = wave_spawning_unit_type.spawn_number
     end
+end
+
+-- Start a new wave of units
+function start_wave()
     next_unit_type = get_next_unit_type()
+    wave_running = true
 end
 
 function get_wave_unit_total(wave)

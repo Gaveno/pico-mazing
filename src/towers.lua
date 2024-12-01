@@ -19,18 +19,12 @@ tower_menu_open_delay = 0
 
 -- Tower Update Functions
 function update_towers()
-    -- Don't aquire targets until units have finished spawning
-    -- Unless it's a chicken
-    if wave_units_to_spawn > 0 and wave_spawning_unit_type.name ~= 'Chicken' then
-        return
-    end
-
     for _, tower in pairs(towers) do
         if tower.cooldown > 0 then
             tower.cooldown -= 1
         end
 
-        if tower.cooldown <= 0 then
+        if tower.cooldown <= 0 and wave_running then
             if tower.target_unit == nil or tower.target_unit.health <= 0 then
                 tower.target_unit = find_nearest_unit_in_range(tower)
             elseif tower_distance_to_unit(tower, tower.target_unit) > tower.type.attack_range then
@@ -38,8 +32,6 @@ function update_towers()
             end
 
             if tower.target_unit ~= nil then
-                -- printh("tower: "..tower.type.name.." attacking: "..target_unit.type.name)
-                -- printh("("..(tower.x * CELL_SIZE)..","..(tower.y * CELL_SIZE)..") -> ("..target_unit.px..","..target_unit.py..")")
                 tower.cooldown = tower.type.attack_speed
 
                 if tower.type.custom_attack then
