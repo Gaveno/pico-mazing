@@ -256,7 +256,7 @@ function move_walking_unit(unit, unit_path_delay)
         local start_x = unit.x
         local start_y = unit.y
 
-        if unit.path != nil then
+        if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
             start_x = unit.path[unit.path_index - 1].x
             start_y = unit.path[unit.path_index - 1].y
         end
