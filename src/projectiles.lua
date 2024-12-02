@@ -21,7 +21,7 @@ function create_projectile(tower, target_unit)
         max_lifetime = lifetime -- Adjust as needed
     }
     add(projectiles, projectile)
-    printh("Created projectile: "..tower.type.attack_type.." total: "..#projectiles)
+    -- printh("Created projectile: "..tower.type.attack_type.." total: "..#projectiles)
 end
 
 -- Update projectiles (movement and collisions)

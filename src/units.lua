@@ -168,8 +168,8 @@ function move_unit_along_path(unit)
             -- Claim next cell
             grid[unit.x][unit.y].unit_id = unit.id
             unit.path_index += 1
-        else
-            printh("Waiting for grid cell to become available: ".."("..next_cell.x..","..next_cell.y..")")
+        -- else
+        --     printh("Waiting for grid cell to become available: ".."("..next_cell.x..","..next_cell.y..")")
         end
     else
         unit.px += dx / dist * speed
@@ -186,7 +186,7 @@ function check_invalid_path(unit)
     end
 
     -- If already looking for a path, wipe out progess
-    printh("Nilling coroutine")
+    -- printh("Nilling coroutine")
     unit.path_coroutine = nil
 
     printh("-- Checking a path --")
@@ -252,9 +252,17 @@ end
 function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
-        printh("Getting new coroutine")
+        -- printh("Getting new coroutine")
+        local start_x = unit.x
+        local start_y = unit.y
+
+        if unit.path != nil then
+            start_x = unit.path[unit.path_index - 1].x
+            start_y = unit.path[unit.path_index - 1].y
+        end
+
         unit.path_coroutine = find_path_coroutine(
-            unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
+            start_x, start_y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
         )
         unit_path_delay = 20
     end
@@ -262,10 +270,10 @@ function move_walking_unit(unit, unit_path_delay)
     -- Keep processing path
     if unit.path_coroutine ~= nil then
         local new_path = nil
-        printh("Processing coroutine")
+        -- printh("Processing coroutine")
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
-            printh("Found path from coroutine")
+            -- printh("Found path from coroutine")
             unit.path_index = 2 -- Start at beginning of path once found
             if unit.path ~= nil then
                 -- grid[unit.x][unit.y].unit_id = nil

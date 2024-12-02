@@ -94,7 +94,7 @@ end
 
 -- Check if a tower can be built at the specified location
 function can_build_tower_at(x, y)
-    if grid[x][y].can_build and grid[x][y].unid_id == nil and get_tower_at(x, y) == nil then
+    if grid[x][y].can_build and grid[x][y].unit_id == nil and get_tower_at(x, y) == nil then
         -- Check if path from spawn to exit exists after building the tower
         -- printh("Checking if there's a valid path with this tower being built")
         towers[x .. ',' .. y] = {
@@ -111,8 +111,8 @@ function can_build_tower_at(x, y)
     else
         game_state = 'normal'
         cursor_cannot_build_timer = 30
+        printh("Could not build tower at ("..x..","..y..")")
     end
-    printh("Could not build tower at ("..x..","..y..")")
 end
 
 -- Keep processing build attempt

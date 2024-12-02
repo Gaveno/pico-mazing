@@ -25,10 +25,6 @@ function _init()
     wave_spawning_unit_type = next_unit_type
     title_y = -32
     prep_wave()
-
-    -- Debug
-    -- test_path = find_path(1, 1, GRID_WIDTH / 2, GRID_HEIGHT-1)
-    -- printh("path length: "..#test_path)
 end
 
 function _update()

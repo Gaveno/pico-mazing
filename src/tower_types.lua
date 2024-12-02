@@ -85,7 +85,6 @@ tower_types = {
         end,
         custom_attack = function(tower)
             -- 4 total projectiles
-            printh("QuadPixel attacking")
             tower.proj_launch_x = 7
             tower.proj_launch_y = 7
             create_projectile(tower, tower.target_unit)
@@ -95,7 +94,6 @@ tower_types = {
             create_projectile(tower, tower.target_unit)
             tower.proj_launch_x = 7
             create_projectile(tower, tower.target_unit)
-            printh("QuadPixel done attacking")
         end
     },
     {

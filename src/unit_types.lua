@@ -213,8 +213,7 @@
      end,
      update = function(unit)
          unit.ability_cooldown = (unit.ability_cooldown - 1) % unit.type.spawn_time
-         -- printh("Ability cooldown: "..unit.ability_cooldown)
- 
+
          -- Check for ability to spawn
          local spawn_x = flr((unit.px + 12) / CELL_SIZE)
          local spawn_y = flr((unit.py + 16) / CELL_SIZE)
@@ -317,7 +316,6 @@
                     --  local owned_cell = unit.path[unit.path_index]
                      grid[unit.x][unit.y].unit_id = nil
                      unit.x_lock = unit.px
-                     printh("BigBoy prepare to jump")
                  end
              end
  
@@ -327,10 +325,8 @@
                  -- Flying over tower
                  local land_x = ceil((unit.px) / CELL_SIZE)
                  local land_y = ceil((unit.py + 4) / CELL_SIZE)
-                 printh("BigBoy looking to land, ab: "..unit.ability_cooldown)
  
                  if get_tower_at(land_x, land_y) == nil then
-                     printh("BigBoy landing, ab: "..unit.ability_cooldown)
                      unit.movement_type = 'walk'
                      unit.ability_cooldown = 180
                      unit.x = land_x

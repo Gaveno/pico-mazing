@@ -26,10 +26,10 @@ function update_waves()
             end
 
             chicken_spawn_delay = unit_types_list['Chicken'].spawn_rate
-            printh("Attempting to spawn: "..wave_spawning_unit_type.name)
+            -- printh("Attempting to spawn: "..wave_spawning_unit_type.name)
             local spawned_unit = spawn_unit(wave_spawning_unit_type)
             if spawned_unit then
-                printh("Successfully spawned "..wave_spawning_unit_type.name)
+                -- printh("Successfully spawned "..wave_spawning_unit_type.name)
                 wave_units_to_spawn -= 1
             end
         end
