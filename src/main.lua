@@ -14,6 +14,7 @@ function _init()
     diamonds = 5
     wave_number = 1
     wave_timer = WAVE_PREP_TIME
+    wave_running = false
     units = {}
     towers = {}
     explosions = {}
@@ -21,11 +22,9 @@ function _init()
     game_state = 'title'
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
     next_unit_type = unit_types_list['Walker']
+    wave_spawning_unit_type = next_unit_type
     title_y = -32
-
-    -- Debug
-    -- test_path = find_path(1, 1, GRID_WIDTH / 2, GRID_HEIGHT-1)
-    -- printh("path length: "..#test_path)
+    prep_wave()
 end
 
 function _update()
