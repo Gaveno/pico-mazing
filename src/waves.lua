@@ -96,9 +96,9 @@ function get_next_unit_type()
         }
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
-            {type = unit_types_list['Chicken'], prob = 0.34},
-            {type = unit_types_list['Lizard'], prob = 0.33},
-            {type = unit_types_list['Knight'], prob = 0.33},
+            -- {type = unit_types_list['Chicken'], prob = 0.34},
+            {type = unit_types_list['Lizard'], prob = 0.5},
+            {type = unit_types_list['Knight'], prob = 0.5},
         }
     end
 

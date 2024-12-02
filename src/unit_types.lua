@@ -314,8 +314,8 @@
                      -- Jump it
                      unit.ability_cooldown = 50
                      unit.movement_type = 'fly'
-                     local owned_cell = unit.path[unit.path_index]
-                     grid[owned_cell.x][owned_cell.y].unit_id = nil
+                    --  local owned_cell = unit.path[unit.path_index]
+                     grid[unit.x][unit.y].unit_id = nil
                      unit.x_lock = unit.px
                      printh("BigBoy prepare to jump")
                  end

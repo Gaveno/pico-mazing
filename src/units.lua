@@ -33,7 +33,7 @@ function spawn_unit(unit_type, x, y)
             py = (spawn_y - 1) * CELL_SIZE,
             path_coroutine = nil,
             path = nil, -- path,
-            path_index = 2,
+            path_index = 1,
             type = unit_type,
             health = unit_type.health(wave_number),
             lifetime = 0,
@@ -136,7 +136,13 @@ function move_unit_along_path(unit)
     end
 
     local target_cell = unit.path[unit.path_index]
-    if get_tower_at(target_cell.x, target_cell.y) then
+    if target_cell.x ~= unit.x or target_cell.y ~= unit.y then
+        grid[unit.x][unit.y].unit_id = nil
+        unit.x = target_cell.x
+        unit.y = target_cell.y
+    end
+
+    if get_tower_at(target_cell.x, target_cell.y) ~= nil then
         -- Invalidate path if blocked
         unit.path = nil
         return
@@ -156,12 +162,14 @@ function move_unit_along_path(unit)
         local next_cell = unit.path[unit.path_index + 1]
         if grid[next_cell.x][next_cell.y].unit_id == nil then
             -- Empty previous cell and update to next target
-            grid[target_cell.x][target_cell.y].unit_id = nil
+            grid[unit.x][unit.y].unit_id = nil
             unit.x = next_cell.x
             unit.y = next_cell.y
             -- Claim next cell
-            grid[next_cell.x][next_cell.y].unit_id = unit.id
+            grid[unit.x][unit.y].unit_id = unit.id
             unit.path_index += 1
+        else
+            printh("Waiting for grid cell to become available: ".."("..next_cell.x..","..next_cell.y..")")
         end
     else
         unit.px += dx / dist * speed
@@ -178,6 +186,7 @@ function check_invalid_path(unit)
     end
 
     -- If already looking for a path, wipe out progess
+    printh("Nilling coroutine")
     unit.path_coroutine = nil
 
     printh("-- Checking a path --")
@@ -201,6 +210,18 @@ function check_invalid_path(unit)
         end
     end
     printh("-- Path has not been invalidated --")
+end
+
+function get_common_node(node_from_x, node_from_y, path_to)
+
+    for i = 1, #path_to, 1 do
+        local tx = path_to[i].x
+        local ty = path_to[i].y
+        if node_from_x == tx and node_from_y == ty then
+            return i
+        end
+    end
+    return 3
 end
 
 -- Function to move flying units
@@ -230,7 +251,8 @@ end
 -- Function to move walking units with path finding
 function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
-    if ((unit.path_coroutine == nil and unit.path == nil) or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
+    if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
+        printh("Getting new coroutine")
         unit.path_coroutine = find_path_coroutine(
             unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
         )
@@ -240,10 +262,18 @@ function move_walking_unit(unit, unit_path_delay)
     -- Keep processing path
     if unit.path_coroutine ~= nil then
         local new_path = nil
+        printh("Processing coroutine")
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
-            unit.path = new_path
+            printh("Found path from coroutine")
             unit.path_index = 2 -- Start at beginning of path once found
+            if unit.path ~= nil then
+                -- grid[unit.x][unit.y].unit_id = nil
+                unit.path_index = get_common_node(unit.x, unit.y, new_path)
+            end
+
+            unit.path = new_path
+            unit.path_invalid_node = nil
         end
     end
     
