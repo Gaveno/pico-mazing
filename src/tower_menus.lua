@@ -61,7 +61,7 @@ end
 function build_tower(x, y, tower_type)
     -- Update grid and unit paths
     -- grid[x][y] = false
-    sfx(0, 0, 0, 8) -- build sound
+    sfx(0, 0, 0, 6) -- build sound
     -- update_unit_paths()
 
     -- Place the tower

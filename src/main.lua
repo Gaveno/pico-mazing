@@ -1,6 +1,9 @@
 -- Variables
 game_state = 'title' -- 'title', 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat'
 title_y = 0
+title_lines = {}
+title_line_spawn = 30
+title_transition = false
 show_game_name = false
 
 
@@ -19,6 +22,9 @@ function _init()
     towers = {}
     explosions = {}
     projectiles = {}
+    title_lines = {}
+    title_line_spawn = 30
+    title_transition = false
     game_state = 'title'
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
     next_unit_type = unit_types_list['Walker']
@@ -53,6 +59,53 @@ function _update()
 end
 
 function update_title()
+    if not title_transition and title_line_spawn > 0 then
+        title_line_spawn -= 1
+    end
+
+    if title_line_spawn == 0 then
+        local line_left = {
+            x = -1,
+            y = rnd(SCREEN_HEIGHT),
+            spd = 1,
+            dir = 0,
+            col = 8 + flr(rnd(5))
+        }
+        add(title_lines, line_left)
+        local line_right = {
+            x = SCREEN_WIDTH,
+            y = rnd(SCREEN_HEIGHT),
+            spd = 1,
+            dir = 0.5,
+            col = 8 + flr(rnd(5))
+        }
+        add(title_lines, line_right)
+        local line_top = {
+            x = rnd(SCREEN_WIDTH),
+            y = -1,
+            spd = 1,
+            dir = 0.25,
+            col = 8 + flr(rnd(5))
+        }
+        add(title_lines, line_top)
+        local line_bottom = {
+            x = rnd(SCREEN_WIDTH),
+            y = SCREEN_HEIGHT,
+            spd = 1,
+            dir = 0.75,
+            col = 8 + flr(rnd(5))
+        }
+        add(title_lines, line_bottom)
+    end
+
+    for line in all(title_lines) do
+        line.x += cos(line.dir) * line.spd
+        line.y += sin(line.dir) * line.spd
+        if line.x < -3 or line.x > SCREEN_WIDTH + 2 or line.y < -3 or line.y > SCREEN_HEIGHT + 2 then
+            del(title_lines, line)
+        end
+    end
+
     if title_y < 30 then
         title_y += 3
 
@@ -65,6 +118,7 @@ function update_title()
 
     if btnp(5) or btnp(4) then
         game_state = 'normal'
+        sfx(5, 0, 0, 18)
     end
 end
 

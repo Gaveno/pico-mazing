@@ -7,6 +7,8 @@ function create_projectile(tower, target_unit)
     local lifetime = 60
     if tower.type.attack_type == 'laser' then -- 'laser'
         lifetime = 10
+    else -- if tower.type.attack_type == 'pixel' then
+        sfx(1, 1, 0, 4)
     end
     local projectile = {
         type = tower.type.attack_type,
@@ -37,6 +39,7 @@ function update_projectiles()
             -- 'laser' is instantaneous
             if proj.lifetime % 3 == 0 then
                 apply_unit_damage(proj)
+                sfx(2, 1, 0, 2)
             end
         end
 
@@ -73,6 +76,7 @@ function check_projectile_collision(proj)
         if proj.splash > 0 then
             apply_unit_damage(proj)
             create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
+            sfx(3, 0, 0, 3)
         else
             apply_unit_damage(proj)
         end

@@ -74,6 +74,7 @@ function update_units()
         -- Should be fine because every unit doesn't have to update each frame
         if unit.health <= 0 then
             diamonds += lookup(unit.type, 'reward', 1)
+            sfx(4, 2, 0, 11)
             remove_unit(unit)
             return
         end
