@@ -88,12 +88,18 @@ function get_next_unit_type()
         {type = unit_types_list['Bat'], prob = 0.20}
     }
 
-    -- Override with boss probabilities for wave 10 and 30
-    if contains(boss_waves, next_wave) then
-        unit_probs = {
-            {type = unit_types_list['Carrier'], prob = 0.5},
-            {type = unit_types_list['BigBoy'], prob = 0.5},
-        }
+    -- Override with boss probabilities for boss waves
+    -- 10, 15, 25, 30
+    if next_wave == 10 or next_wave == 25 then
+        unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
+    elseif next_wave == 15 or next_wave == 30 then
+        unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
+    -- end
+    -- if contains(boss_waves, next_wave) then
+    --     unit_probs = {
+    --         {type = unit_types_list['Carrier'], prob = 0.5},
+    --         {type = unit_types_list['BigBoy'], prob = 0.5},
+    --     }
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
             -- {type = unit_types_list['Chicken'], prob = 0.34},
