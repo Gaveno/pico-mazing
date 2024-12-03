@@ -254,16 +254,16 @@ function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
         -- printh("Getting new coroutine")
-        local start_x = unit.x
-        local start_y = unit.y
+        -- local start_x = unit.x
+        -- local start_y = unit.y
 
-        if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
-            start_x = unit.path[unit.path_index - 1].x
-            start_y = unit.path[unit.path_index - 1].y
-        end
+        -- if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
+        --     start_x = unit.path[unit.path_index].x
+        --     start_y = unit.path[unit.path_index].y
+        -- end
 
         unit.path_coroutine = find_path_coroutine(
-            start_x, start_y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
+            unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
         )
         unit_path_delay = 20
     end
