@@ -59,10 +59,7 @@ end
 
 -- Function to build a tower at a specific location
 function build_tower(x, y, tower_type)
-    -- Update grid and unit paths
-    -- grid[x][y] = false
     sfx(0, 0, 0, 6) -- build sound
-    -- update_unit_paths()
 
     -- Place the tower
     towers[x .. ',' .. y] = {
@@ -87,8 +84,6 @@ function sell_tower(x, y)
         -- Remove tower
         -- grid[x][y] = true
         towers[x .. ',' .. y] = nil
-
-        update_unit_paths()
     end
 end
 
@@ -106,7 +101,7 @@ function can_build_tower_at(x, y)
         local spawn_x = flr(GRID_WIDTH / 2)
         local spawn_y = 1
         -- local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
-        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y, 10)
+        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y, 15)
         found_build_path = false
     else
         game_state = 'normal'

@@ -2,7 +2,7 @@
 game_state = 'title' -- 'title', 'normal', 'tower_menu', 'sell_menu', 'victory', 'defeat'
 title_y = 0
 title_lines = {}
-title_line_spawn = 30
+title_line_spawn = 0
 title_transition = false
 show_game_name = false
 
@@ -23,7 +23,7 @@ function _init()
     explosions = {}
     projectiles = {}
     title_lines = {}
-    title_line_spawn = 30
+    title_line_spawn = 0
     title_transition = false
     game_state = 'title'
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
@@ -59,50 +59,72 @@ function _update()
 end
 
 function update_title()
-    if not title_transition and title_line_spawn > 0 then
-        title_line_spawn -= 1
+    if not title_transition then
+        if title_line_spawn > 0 then
+            title_line_spawn -= 1
+        end
+
+        if title_line_spawn == 0 then
+            local line_left = {
+                x = -1,
+                y = rnd(SCREEN_HEIGHT),
+                spd = 1,
+                dir = 0,
+                col = 8 + flr(rnd(5)),
+                len = flr(rnd(10)) + 2
+            }
+            add(title_lines, line_left)
+            local line_right = {
+                x = SCREEN_WIDTH,
+                y = rnd(SCREEN_HEIGHT),
+                spd = 1,
+                dir = 0.5,
+                col = 8 + flr(rnd(5)),
+                len = flr(rnd(10)) + 2
+            }
+            add(title_lines, line_right)
+            local line_top = {
+                x = rnd(SCREEN_WIDTH),
+                y = -1,
+                spd = 1,
+                dir = 0.75,
+                col = 8 + flr(rnd(5)),
+                len = flr(rnd(10)) + 2
+            }
+            add(title_lines, line_top)
+            local line_bottom = {
+                x = rnd(SCREEN_WIDTH),
+                y = SCREEN_HEIGHT,
+                spd = 1,
+                dir = 0.25,
+                col = 8 + flr(rnd(5)),
+                len = flr(rnd(10)) + 2
+            }
+            add(title_lines, line_bottom)
+            title_line_spawn = 5
+        end
+    else
+        if title_line_spawn > 0 then
+            title_line_spawn -= 1
+        else
+            game_state = 'normal'
+            title_lines = {}
+        end
     end
 
-    if title_line_spawn == 0 then
-        local line_left = {
-            x = -1,
-            y = rnd(SCREEN_HEIGHT),
-            spd = 1,
-            dir = 0,
-            col = 8 + flr(rnd(5))
-        }
-        add(title_lines, line_left)
-        local line_right = {
-            x = SCREEN_WIDTH,
-            y = rnd(SCREEN_HEIGHT),
-            spd = 1,
-            dir = 0.5,
-            col = 8 + flr(rnd(5))
-        }
-        add(title_lines, line_right)
-        local line_top = {
-            x = rnd(SCREEN_WIDTH),
-            y = -1,
-            spd = 1,
-            dir = 0.25,
-            col = 8 + flr(rnd(5))
-        }
-        add(title_lines, line_top)
-        local line_bottom = {
-            x = rnd(SCREEN_WIDTH),
-            y = SCREEN_HEIGHT,
-            spd = 1,
-            dir = 0.75,
-            col = 8 + flr(rnd(5))
-        }
-        add(title_lines, line_bottom)
-    end
+    -- Update title lines
+    for i in all(title_lines) do
+        if title_transition then
+            local text_y = 80
+            local text_x = SCREEN_WIDTH / 2
+            i.dir = atan2(i.x - text_x, i.y - text_y)
+            i.spd = 4
+        end
 
-    for line in all(title_lines) do
-        line.x += cos(line.dir) * line.spd
-        line.y += sin(line.dir) * line.spd
-        if line.x < -3 or line.x > SCREEN_WIDTH + 2 or line.y < -3 or line.y > SCREEN_HEIGHT + 2 then
-            del(title_lines, line)
+        i.x += cos(i.dir) * i.spd
+        i.y += sin(i.dir) * i.spd
+        if i.x < -10 or i.x > SCREEN_WIDTH + 10 or i.y < -10 or i.y > SCREEN_HEIGHT + 10 then
+            del(title_lines, i)
         end
     end
 
@@ -117,9 +139,11 @@ function update_title()
     end
 
     if btnp(5) or btnp(4) then
-        game_state = 'normal'
+        title_transition = true
+        title_line_spawn = 30
         sfx(5, 0, 0, 18)
     end
+
 end
 
 
@@ -165,13 +189,26 @@ end
 function draw_title()
     cls(1)
     camera()
+
+    for i in all(title_lines) do
+        local line_length = 8
+        local prev_x = i.x + cos(i.dir + 0.5) * i.len
+        local prev_y = i.y + sin(i.dir + 0.5) * i.len
+        line(prev_x, prev_y, i.x, i.y, i.col)
+    end
+
     palt(0, false)
     palt(1, true)
-    spr(128, 6, title_y, 15, 4)
+    spr(128, 6, -sin(percent_range(title_y, 0, 30) / 4) * 30, 15, 4)
     palt()
 
     if title_y >= 30 then
-        print("press x or o", 40, 80, 7)
+        if not title_transition or title_line_spawn % 2 == 0 then
+            for i = 0, 12, 1 do
+                circfill(37 + i * 4, 80 + 4 * (i + 1) % 3, 5, 7)
+            end
+            print("press x or o", 37, 80, 0)
+        end
     end
 end
 

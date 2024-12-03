@@ -94,12 +94,6 @@ function get_next_unit_type()
         unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
     elseif next_wave == 15 or next_wave == 30 then
         unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
-    -- end
-    -- if contains(boss_waves, next_wave) then
-    --     unit_probs = {
-    --         {type = unit_types_list['Carrier'], prob = 0.5},
-    --         {type = unit_types_list['BigBoy'], prob = 0.5},
-    --     }
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
             -- {type = unit_types_list['Chicken'], prob = 0.34},

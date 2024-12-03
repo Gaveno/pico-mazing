@@ -6,14 +6,6 @@ chicken_deploy_y = 0
 spawned_boss = nil
 check_invalid_nodes = false
 
- 
- -- Update paths for existing units
- function update_unit_paths()
-    for unit in all(units) do
-        unit.path = nil
-    end
-end
-
 -- Unit Initialization
 function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
@@ -40,6 +32,7 @@ function spawn_unit(unit_type, x, y)
             id = next_unit_id,
             ability_cooldown = 0,
             path_invalid_node = nil,
+            dir = 0.75,
         }
 
         -- Initialize if has init function
@@ -107,21 +100,44 @@ function update_units()
     check_invalid_nodes = false
 end
 
--- Clean up unit
-function remove_unit(unit)
-    grid[unit.x][unit.y].unit_id = nil
-    unit.health = 0
-    del(units, unit)
+-- Function to move walking units with path finding
+function move_walking_unit(unit, unit_path_delay)
+    -- Start finding path
+    if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
+        -- printh("Getting new coroutine")
+        -- local start_x = unit.x
+        -- local start_y = unit.y
 
-    if #units <= 0 then
-        wave_running = false
-        prep_wave()
+        -- if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
+        --     start_x = unit.path[unit.path_index].x
+        --     start_y = unit.path[unit.path_index].y
+        -- end
+
+        unit.path_coroutine = find_path_coroutine(
+            unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 13 - #units)
+        )
+        unit_path_delay = 20
     end
 
-    -- Boss handling
-    if unit == spawned_boss then
-        spawned_boss = nil
+    -- Keep processing path
+    if unit.path_coroutine ~= nil then
+        local new_path = nil
+        -- printh("Processing coroutine")
+        unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
+        if new_path ~= nil then
+            -- printh("Found path from coroutine")
+            unit.path_index = 2 -- Start at beginning of path once found
+            if unit.path ~= nil then
+                -- grid[unit.x][unit.y].unit_id = nil
+                unit.path_index = get_common_node(unit.x, unit.y, new_path)
+            end
+
+            unit.path = new_path
+            unit.path_invalid_node = nil
+        end
     end
+    
+    move_unit_along_path(unit)
 end
 
 
@@ -180,9 +196,19 @@ end
 
 -- Check for path being invalid and recalculate if needed
 function check_invalid_path(unit)
-    if not unit.path or unit.path_invalid_node ~= nil or
-    unit.path_coroutine ~= nil or not check_invalid_nodes then
+    if not check_invalid_nodes then
+        return
+    end
+
+    if not unit.path then -- or unit.path_invalid_node ~= nil then
+    -- not check_invalid_nodes then -- unit.path_coroutine ~= nil then
         -- Already looking for new path or not needed
+        if not unit.path then
+            printh("Unit path exists")
+        end
+        if unit.path_invalid_node ~= nil then
+            printh("Unit has invalid node")
+        end
         return
     end
 
@@ -231,14 +257,12 @@ function move_flying_unit(unit)
         return
     end
 
-    unit.py += unit.type.speed(unit, wave_number) / 15
-    if unit.px < (GRID_WIDTH - 1) / 2 * CELL_SIZE then
-        unit.px += unit.type.speed(unit, wave_number) / 15
+    if unit.type.name == 'Carrier' or (unit.type.name == 'Bat' and t() % 2 == 0) then
+        unit.dir = atan2(SCREEN_WIDTH / 2 - 16 + rnd(32) - unit.px, GRID_HEIGHT * CELL_SIZE - unit.py)
     end
 
-    if unit.px > (GRID_WIDTH + 1) / 2 * CELL_SIZE then
-        unit.px -= unit.type.speed(unit, wave_number) / 15
-    end
+    unit.py += sin(unit.dir) * unit.type.speed(unit, wave_number) / 15
+    unit.px += cos(unit.dir) * unit.type.speed(unit, wave_number) / 15
 
     if unit.py >= ((GRID_HEIGHT - 1) * CELL_SIZE) then
         remove_unit(unit)
@@ -249,57 +273,36 @@ function move_flying_unit(unit)
     end
 end
 
--- Function to move walking units with path finding
-function move_walking_unit(unit, unit_path_delay)
-    -- Start finding path
-    if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
-        -- printh("Getting new coroutine")
-        -- local start_x = unit.x
-        -- local start_y = unit.y
+-- Clean up unit
+function remove_unit(unit)
+    grid[unit.x][unit.y].unit_id = nil
+    unit.health = 0
+    del(units, unit)
 
-        -- if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
-        --     start_x = unit.path[unit.path_index].x
-        --     start_y = unit.path[unit.path_index].y
-        -- end
-
-        unit.path_coroutine = find_path_coroutine(
-            unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 4)
-        )
-        unit_path_delay = 20
+    if #units <= 0 then
+        wave_running = false
+        prep_wave()
     end
 
-    -- Keep processing path
-    if unit.path_coroutine ~= nil then
-        local new_path = nil
-        -- printh("Processing coroutine")
-        unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
-        if new_path ~= nil then
-            -- printh("Found path from coroutine")
-            unit.path_index = 2 -- Start at beginning of path once found
-            if unit.path ~= nil then
-                -- grid[unit.x][unit.y].unit_id = nil
-                unit.path_index = get_common_node(unit.x, unit.y, new_path)
-            end
-
-            unit.path = new_path
-            unit.path_invalid_node = nil
-        end
+    -- Boss handling
+    if unit == spawned_boss then
+        spawned_boss = nil
     end
-    
-    move_unit_along_path(unit)
 end
 
 -- Unit Drawing
 function draw_units()
-    if not wave_running then
-        return
-    end
+    -- if not wave_running then
+    --     return
+    -- end
 
     for unit in all(units) do
         local x = unit.px
         local y = unit.py
         unit.type.draw(unit, x, y)
+        -- draw_unit_path(unit)
     end
+
 end
 
 -- Draw Boss Healthbar
@@ -310,4 +313,21 @@ function draw_boss_healthbar()
 
     local pr = percent_range(spawned_boss.health, 0, spawned_boss.health_max)
     rectfill(0, HUD_HEIGHT, ceil(SCREEN_WIDTH * pr), HUD_HEIGHT + 4, 8)
+end
+
+
+-- For debugging
+function draw_unit_path(unit)
+    if unit.path ~= nil then
+        local c = 11
+        if unit.path_coroutine ~= nil then
+            c = 10
+        end
+
+        for i = 2, #unit.path, 1 do
+            line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
+                unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
+            )
+        end
+    end
 end
