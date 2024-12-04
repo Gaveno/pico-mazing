@@ -8,7 +8,6 @@ wave_units_to_spawn = 0
 wave_spawning_unit_type = nil
 wave_is_elite = false
 wave_running = false
-chicken_spawn_delay = 0
 
 -- Wave variables
 boss_waves = {10, 30}
@@ -18,20 +17,9 @@ elite_waves = {7, 13, 19, 23, 27}
 function update_waves()
     -- Check if wave is still spawning
     if wave_units_to_spawn > 0 then
-        if wave_spawning_unit_type.name == 'Chicken' and chicken_spawn_delay > 0 then
-            chicken_spawn_delay -= 1
-        else
-            if wave_spawning_unit_type.name == 'Chicken' and not wave_running then
-                return -- Don't prespawn chickens
-            end
-
-            chicken_spawn_delay = unit_types_list['Chicken'].spawn_rate
-            -- printh("Attempting to spawn: "..wave_spawning_unit_type.name)
-            local spawned_unit = spawn_unit(wave_spawning_unit_type)
-            if spawned_unit then
-                -- printh("Successfully spawned "..wave_spawning_unit_type.name)
-                wave_units_to_spawn -= 1
-            end
+        local spawned_unit = spawn_unit(wave_spawning_unit_type)
+        if spawned_unit then
+            wave_units_to_spawn -= 1
         end
     end
 
@@ -96,16 +84,10 @@ function get_next_unit_type()
         unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
-            -- {type = unit_types_list['Chicken'], prob = 0.34},
-            {type = unit_types_list['Lizard'], prob = 0.5},
-            {type = unit_types_list['Knight'], prob = 0.5},
+            {type = unit_types_list['Lizard'], prob = 0.37},
+            {type = unit_types_list['Knight'], prob = 0.37},
+            {type = unit_types_list['Bat'], prob = 0.26}
         }
-    end
-
-    -- Set chicken deploy
-    if unit_probs[1].type.name == 'Chicken' then
-        chicken_deploy_y = 8
-        chcken_deploy_y = chicken_deploy_y + ceil(rnd(GRID_HEIGHT - 3 - chicken_deploy_y))
     end
 
     -- Randomly select unit type based on probabilities

@@ -85,7 +85,14 @@
      name = 'Bat',
      type = 'basic',
      health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
-     speed = function(unit, wave_number) return 4 + flr(wave_number / 5) * 2 end,
+     speed = function(unit, wave_number)
+        local base = 4
+        if wave_is_elite then
+            base += 2
+        end
+
+        return base + flr(wave_number / 5) * 2
+    end,
      movement_type = 'fly',
      weakness = 'bomb',
      strength = 'pixel',
@@ -98,73 +105,79 @@
          if flr(unit.lifetime / 8) % 2 == 0 then
              flip = true
          end
+
+         -- Draw elite version
+         if wave_is_elite then
+            pal({[0]=3, [7]=0})
+         end
  
          palt(0, false)
          spr(24 + flr(unit.lifetime / 3) % 2, x, y, 1, 1, flip, false)
  
          palt()
+         pal()
      end
  }
- unit_types_list['Chicken'] = {
-     name = 'Chicken',
-     type = 'elite',
-     spawn_rate = 20,
-     health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
-     speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
-     movement_type = 'fly',
-     weakness = 'pixel',
-     strength = 'laser',
-     path_iterations = 10,
-     init = function(unit)
-         if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
-         if unit.is_rooster then
-             unit.health = unit.health * 1.4
-         end
+--  unit_types_list['Chicken'] = {
+--      name = 'Chicken',
+--      type = 'elite',
+--      spawn_rate = 20,
+--      health = function(wave_number) return 5 * wave_number / 2 + flr(wave_number / 5) * 2 end,
+--      speed = function(unit, wave_number) return 5 + flr(wave_number / 5) * 2 end,
+--      movement_type = 'fly',
+--      weakness = 'pixel',
+--      strength = 'laser',
+--      path_iterations = 10,
+--      init = function(unit)
+--          if rnd(100) < 33 then unit.is_rooster = 1 else unit.is_rooster = 0 end
+--          if unit.is_rooster then
+--              unit.health = unit.health * 1.4
+--          end
  
-         unit.fly_duration = 30 + rnd(30)
-         unit.flying = true
-     end,
-     draw = function(unit, x, y)
-         if not unit.is_rooster then
-             unit.is_rooster = 0
-         end
+--          unit.fly_duration = 30 + rnd(30)
+--          unit.flying = true
+--      end,
+--      draw = function(unit, x, y)
+--          if not unit.is_rooster then
+--              unit.is_rooster = 0
+--          end
  
-         local flip = false
-         local image = 80
-         if not unit.flying then
-             image = 64
-             if flr(unit.lifetime / 12) % 2 == 0 then
-                 flip = true
-             end
-         end
+--          local flip = false
+--          local image = 80
+--          if not unit.flying then
+--              image = 64
+--              if flr(unit.lifetime / 12) % 2 == 0 then
+--                  flip = true
+--              end
+--          end
  
-         local flip = false
-         if flr(unit.lifetime / 10) % 2 == 0 and not unit.flying then
-             flip = true
-         end
+--          local flip = false
+--          if flr(unit.lifetime / 10) % 2 == 0 and not unit.flying then
+--              flip = true
+--          end
  
-         spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y, 1, 1, flip)
-     end,
-     update = function(unit, x, y)
-         if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then
-             unit.py = chicken_deploy_y * CELL_SIZE
-             unit.fly_duration -= 1
-         else
-             if unit.flying then
-                 local land_x = ceil((unit.px) / CELL_SIZE) + 1
-                 local land_y = ceil((unit.py) / CELL_SIZE)
+--          spr(image + flr(unit.lifetime / 3) % 2 + unit.is_rooster * 2, x, y, 1, 1, flip)
+--      end,
+--      update = function(unit, x, y)
+--          if unit.fly_duration > 0 and unit.px / CELL_SIZE < GRID_WIDTH / 2 then
+--              unit.py = chicken_deploy_y * CELL_SIZE
+--              unit.fly_duration -= 1
+--          else
+--              if unit.flying then
+--                  local land_x = ceil((unit.px) / CELL_SIZE) + 1
+--                  local land_y = ceil((unit.py) / CELL_SIZE)
  
-                 if get_tower_at(land_x, land_y) == nil and grid[land_x][land_y].unit_id == nil then
-                     unit.flying = false
-                     unit.movement_type = 'walk'
-                     unit.x = land_x
-                     unit.y = land_y
-                 end
-             end
-         end
+--                  if get_tower_at(land_x, land_y) == nil and grid[land_x][land_y].unit_id == nil then
+--                      unit.flying = false
+--                      unit.movement_type = 'walk'
+--                      unit.x = land_x
+--                      unit.y = land_y
+--                  end
+--              end
+--          end
  
-     end
- }
+--      end
+--  }
  
  
  -- Bosses
@@ -212,6 +225,10 @@
          -- rect(x, y, x + 7, y + 7, 2)
      end,
      update = function(unit)
+        if not wave_running then
+            return
+        end
+        
          unit.ability_cooldown = (unit.ability_cooldown - 1) % unit.type.spawn_time
 
          -- Check for ability to spawn

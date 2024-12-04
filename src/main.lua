@@ -6,6 +6,13 @@ title_line_spawn = 0
 title_transition = false
 show_game_name = false
 
+-- Playthrough Stats
+units_killed = 0
+elites_killed = 0
+bosses_killed = 0
+towers_built = 0
+towers_sold = 0
+
 
 -- Initialize grid and game elements
 function _init()
@@ -30,6 +37,14 @@ function _init()
     next_unit_type = unit_types_list['Walker']
     wave_spawning_unit_type = next_unit_type
     title_y = -32
+
+    -- Playthrough Stats
+    units_killed = 0
+    bosses_killed = 0
+    towers_built = 0
+    towers_sold = 0
+    lives_lost = 0
+
     prep_wave()
 end
 
@@ -175,8 +190,10 @@ function _draw()
         draw_sell_menu()
     elseif game_state == 'victory' then
         draw_victory_screen()
+        return
     elseif game_state == 'defeat' then
         draw_defeat_screen()
+        return
     end
 
     if not show_game_name then
@@ -214,16 +231,28 @@ end
 
 function draw_victory_screen()
     -- rectfill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 0) -- Black background
-    cls(0)
+    cls(1)
     camera()
-    print("Victory!", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 10, 7)
-    print("Press X or O to Restart", SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, 7)
+    print("victory!", SCREEN_WIDTH / 2 - 20, 20, 10)
+    draw_stats()
 end
 
 function draw_defeat_screen()
     -- rectfill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 0) -- Black background
-    cls(0)
+    cls(1)
     camera()
-    print("Defeat - "..(wave_number - 1).." waves finished", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 10, 7)
-    print("Press X or O to Restart", SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, 7)
+    print("defeat!", SCREEN_WIDTH / 2 - 15, 20, 8)
+    draw_stats()
+end
+
+function draw_stats()
+    print("waves survived "..(wave_number - 2), 30, 30, 12)
+    print("bosses killed  "..bosses_killed, 30, 40, 12)
+    print("elites killed  "..elites_killed, 30, 50, 12)
+    print("units killed   "..units_killed, 30, 60, 12)
+    print("lives lost     "..(6 - lives), 30, 70, 12)
+    print("towers built   "..towers_built, 30, 80, 12)
+    print("towers sold    "..towers_sold, 30, 90, 12)
+
+    print("press x or o to restart", 16, 106, 7)
 end

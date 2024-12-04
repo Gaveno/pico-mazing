@@ -49,7 +49,7 @@ function find_path_coroutine(start_x, start_y, goal_x, goal_y, max_iterations)
             local neighbors = get_neighbors(current_node.x, current_node.y)
             for _, neighbor in ipairs(neighbors) do
                 if not in_list(closed_list, neighbor.x, neighbor.y) then
-                    local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.4142
+                    local movement_cost = (neighbor.dx == 0 or neighbor.dy == 0) and 1 or 1.5--1.4142
                     local tentative_g = current_node.g + movement_cost
                     local neighbor_in_open = in_open_list(open_list, neighbor.x, neighbor.y)
                     if not neighbor_in_open or tentative_g < neighbor_in_open.g then
@@ -100,7 +100,7 @@ function heuristic(x1, y1, x2, y2)
     local dx = abs(x1 - x2)
     local dy = abs(y1 - y2)
     local F = 1.0
-    local D = 1.4142
+    local D = 1.5 --1.4142
     return F * (dx + dy) + (D - 2 * F) * min(dx, dy)
 end
 

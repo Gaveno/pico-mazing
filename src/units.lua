@@ -2,7 +2,6 @@
 units = {}
 unit_path_delay = 0
 next_unit_id = 0
-chicken_deploy_y = 0
 spawned_boss = nil
 check_invalid_nodes = false
 
@@ -10,11 +9,6 @@ check_invalid_nodes = false
 function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
-
-    if unit_type.name == 'Chicken' then
-        spawn_y = chicken_deploy_y
-        spawn_x = 1
-    end
 
     if grid[spawn_x][spawn_y].unit_id == nil then
 
@@ -66,6 +60,14 @@ function update_units()
         -- Check life and terminate early if a unit dies
         -- Should be fine because every unit doesn't have to update each frame
         if unit.health <= 0 then
+            if wave_is_elite then
+                elites_killed += 1
+            elseif unit.type.type == 'basic' then
+                units_killed += 1
+            elseif unit.type.type == 'boss' then
+                bosses_killed += 1
+            end
+            
             diamonds += lookup(unit.type, 'reward', 1)
             sfx(4, 2, 0, 11)
             remove_unit(unit)
@@ -104,19 +106,11 @@ end
 function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
-        -- printh("Getting new coroutine")
-        -- local start_x = unit.x
-        -- local start_y = unit.y
-
-        -- if unit.path ~= nil and unit.path[unit.path_index - 1] ~= nil then
-        --     start_x = unit.path[unit.path_index].x
-        --     start_y = unit.path[unit.path_index].y
-        -- end
 
         unit.path_coroutine = find_path_coroutine(
             unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 13 - #units)
         )
-        unit_path_delay = 20
+        unit_path_delay = 40
     end
 
     -- Keep processing path
@@ -185,8 +179,6 @@ function move_unit_along_path(unit)
             -- Claim next cell
             grid[unit.x][unit.y].unit_id = unit.id
             unit.path_index += 1
-        -- else
-        --     printh("Waiting for grid cell to become available: ".."("..next_cell.x..","..next_cell.y..")")
         end
     else
         unit.px += dx / dist * speed
@@ -292,6 +284,10 @@ end
 
 -- Unit Drawing
 function draw_units()
+    for unit in all(units) do
+        draw_unit_path(unit)
+    end
+
     -- if not wave_running then
     --     return
     -- end
@@ -300,7 +296,6 @@ function draw_units()
         local x = unit.px
         local y = unit.py
         unit.type.draw(unit, x, y)
-        -- draw_unit_path(unit)
     end
 
 end
@@ -319,15 +314,17 @@ end
 -- For debugging
 function draw_unit_path(unit)
     if unit.path ~= nil then
-        local c = 11
+        local c = 12
         if unit.path_coroutine ~= nil then
             c = 10
         end
 
-        for i = 2, #unit.path, 1 do
-            line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
-                unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
-            )
+        for i = unit.path_index + 1, #unit.path, 1 do
+            if unit.path[i - 1] ~= nil then
+                line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
+                    unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
+                )
+            end
         end
     end
 end

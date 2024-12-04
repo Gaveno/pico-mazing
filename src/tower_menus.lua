@@ -61,6 +61,8 @@ end
 function build_tower(x, y, tower_type)
     sfx(0, 0, 0, 6) -- build sound
 
+    towers_built += 1
+
     -- Place the tower
     towers[x .. ',' .. y] = {
         x = x,
@@ -80,9 +82,9 @@ function sell_tower(x, y)
         -- Refund diamonds
         local refund = ceil(tower.type.cost * 0.75)
         diamonds += refund
+        towers_sold += 1
 
         -- Remove tower
-        -- grid[x][y] = true
         towers[x .. ',' .. y] = nil
     end
 end
@@ -91,7 +93,6 @@ end
 function can_build_tower_at(x, y)
     if grid[x][y].can_build and grid[x][y].unit_id == nil and get_tower_at(x, y) == nil then
         -- Check if path from spawn to exit exists after building the tower
-        -- printh("Checking if there's a valid path with this tower being built")
         towers[x .. ',' .. y] = {
             x = x,
             y = y,
@@ -100,7 +101,6 @@ function can_build_tower_at(x, y)
         }
         local spawn_x = flr(GRID_WIDTH / 2)
         local spawn_y = 1
-        -- local path = find_path(spawn_x, spawn_y, EXIT_X, EXIT_Y)
         building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y, 15)
         found_build_path = false
     else
