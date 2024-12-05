@@ -172,17 +172,37 @@ function draw_projectiles()
             palt(1, true)
             sspr(48 + (flr(proj.lifetime / 4) % 2) * 4, 8 + yimage * 4, 4, 4, x-1, y-1)
             palt()
-            -- spr(22 , x-1, y-1, 0.5, 0.5)
-            -- local scaler = proj.lifetime % proj.splash
-            -- rectfill(x - 1 - scaler, y - 1 - scaler, x + 1 + scaler, y + 1 + scaler, 8) -- Red square 'bomb'
         elseif proj.type == 'laser' then
+            local ex = proj.target.px + CELL_SIZE / 2
+            local ey = proj.target.py + CELL_SIZE / 2
+
             if proj.lifetime < proj.max_lifetime and proj.lifetime % 2 == 0 then
                 -- Draw 'laser' beam
-                local sx = x
-                local sy = y
-                local ex = proj.target.px + CELL_SIZE / 2
-                local ey = proj.target.py + CELL_SIZE / 2
-                line(sx, sy, ex, ey, 8) -- Red color
+                line(x, y, ex, ey, 8) -- Red color
+                local r_base = 0
+
+                if proj.range == 40 then
+                    r_base = 1
+                end
+
+                circfill(ex, ey, 1 + r_base, 8)
+                circfill(ex, ey, 0 + r_base, 7)
+            end
+
+            -- More powerful laser gets added effect
+            if proj.range == 40 then
+                local dx = ex - x
+                local dy = ey - y
+                local distance = sqrt(dx * dx + dy * dy)
+                local line_angle = atan2(dx, dy)
+
+                for i = 0, ceil(distance / 7), 1 do
+                    local offset = i * (distance / 8) + proj.lifetime % 8
+                    local ix = x + cos(line_angle) * offset
+                    local iy = y + sin(line_angle) * offset
+                    circfill(ix, iy, 1, 8)
+                    pset(ix, iy, 7)
+                end
             end
         end
     end
