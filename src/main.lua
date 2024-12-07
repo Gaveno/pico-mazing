@@ -227,9 +227,6 @@ function draw_title()
 
     if title_y >= 30 and game_difficulty == -1 then
         if not title_transition or title_line_spawn % 2 == 0 then
-            -- for i = 0, 12, 1 do
-            --     circfill(37 + i * 4, 80 + 4 * (i + t()) % 3, 5, 7)
-            -- end
             draw_selector(12, 37, 80)
             print("press x or o", 37, 80, 0)
         end
@@ -239,10 +236,6 @@ function draw_title()
         draw_selector(6, 50, 80 + 12 * game_difficulty)
         print("normal", 52, 80, 0)
         print("hard", 55, 92, 0)
-        -- if not title_transition or title_line_spawn % 2 == 0 then
-        --     draw_selector(12, 37, 80)
-        --     print("press x or o", 37, 80, 0)
-        -- end
     end
 end
 
@@ -253,7 +246,6 @@ function draw_selector(width, x, y)
 end
 
 function draw_victory_screen()
-    -- rectfill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 0) -- Black background
     cls(1)
     camera()
     print("victory!", SCREEN_WIDTH / 2 - 20, 20, 10)
@@ -261,7 +253,6 @@ function draw_victory_screen()
 end
 
 function draw_defeat_screen()
-    -- rectfill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 0) -- Black background
     cls(1)
     camera()
     print("defeat!", SCREEN_WIDTH / 2 - 15, 20, 8)

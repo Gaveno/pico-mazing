@@ -5,7 +5,6 @@ next_unit_id = 0
 spawned_boss = nil
 check_invalid_nodes = false
 
--- Unit Initialization
 function spawn_unit(unit_type, x, y)
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
@@ -18,7 +17,7 @@ function spawn_unit(unit_type, x, y)
             px = (spawn_x - 1) * CELL_SIZE,
             py = (spawn_y - 1) * CELL_SIZE,
             path_coroutine = nil,
-            path = nil, -- path,
+            path = nil,
             path_index = 1,
             type = unit_type,
             health = unit_type.health(wave_number),
@@ -30,7 +29,6 @@ function spawn_unit(unit_type, x, y)
         }
         unit.health += game_difficulty * unit.health * 0.4
 
-        -- Initialize if has init function
         if unit.type.init then
             unit.type.init(unit)
         end
@@ -43,12 +41,10 @@ function spawn_unit(unit_type, x, y)
         add(units, unit)
 
         return true -- Success
-    else
-        return false -- Failed to spawn
     end
+    return false -- Failed to spawn
 end
 
--- Update units (movement and removal)
 function update_units()
     if unit_path_delay > 0 then
         unit_path_delay -= 1
@@ -75,7 +71,6 @@ function update_units()
             return
         end
 
-        -- Move the unit according to it's movement_type
         if lookup(unit, 'movement_type', unit.type.movement_type) == 'fly' then
             move_flying_unit(unit)
         else
@@ -190,27 +185,15 @@ function check_invalid_path(unit)
         return
     end
 
-    if not unit.path then -- or unit.path_invalid_node ~= nil then
-    -- not check_invalid_nodes then -- unit.path_coroutine ~= nil then
-        -- Already looking for new path or not needed
-        -- if not unit.path then
-        --     printh("Unit path exists")
-        -- end
-        -- if unit.path_invalid_node ~= nil then
-        --     printh("Unit has invalid node")
-        -- end
+    if not unit.path then
         return
     end
 
     -- If already looking for a path, wipe out progess
-    -- printh("Nilling coroutine")
     unit.path_coroutine = nil
-
-    -- printh("-- Checking a path --")
     for i = unit.path_index + 1, #unit.path, 1 do
         local node = unit.path[i]
         if get_tower_at(node.x, node.y) ~= nil then
-            -- printh("Non-diagonal node invalid: " .. i)
             unit.path_invalid_node = i
             return
         else
@@ -219,14 +202,12 @@ function check_invalid_path(unit)
             if prev_node.x ~= node.x and prev_node.y ~= node.y then
                 -- Is a diagonal
                 if get_tower_at(prev_node.x, node.y) ~= nil or get_tower_at(node.x, prev_node.y) ~= nil then
-                    -- printh("Diagonal node invalid: " .. i)
                     unit.path_invalid_node = i
                     return
                 end
             end
         end
     end
-    -- printh("-- Path has not been invalidated --")
 end
 
 function get_common_node(node_from_x, node_from_y, path_to)
@@ -241,7 +222,6 @@ function get_common_node(node_from_x, node_from_y, path_to)
     return 3
 end
 
--- Function to move flying units
 function move_flying_unit(unit)
     if not wave_running then
         return
@@ -288,10 +268,6 @@ function draw_units()
         end
     end
 
-    -- if not wave_running then
-    --     return
-    -- end
-
     for unit in all(units) do
         local x = unit.px
         local y = unit.py
@@ -310,8 +286,6 @@ function draw_boss_healthbar()
     rectfill(0, HUD_HEIGHT, ceil(SCREEN_WIDTH * pr), HUD_HEIGHT + 4, 8)
 end
 
-
--- For debugging
 function draw_unit_path(unit)
     if unit.path ~= nil then
         local c = 12

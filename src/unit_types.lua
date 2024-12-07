@@ -9,7 +9,6 @@
      weakness = nil,
      strength = nil,
      draw = function(unit, x, y)
-         -- Draw Walker
          palt(1, true)
          local flip = false
          if flr(unit.lifetime / 4) % 2 == 0 then
@@ -35,7 +34,6 @@
     weakness = 'laser',
     strength = 'bomb',
     draw = function(unit, x, y)
-         -- Draw Knight Walker
          palt(1, true)
          local flip = false
          if flr(unit.lifetime / 6) % 2 == 0 then
@@ -66,7 +64,6 @@
      weakness = 'pixel',
      strength = 'laser',
      draw = function(unit, x, y)
-         -- Draw Lizard
          local flip = false
          if flr(unit.lifetime / 10) % 2 == 0 then
              flip = true
@@ -97,10 +94,8 @@
      weakness = 'bomb',
      strength = 'pixel',
      draw = function(unit, x, y)
-         -- Draw bat
          palt(15, true)
  
-         -- Flip sprite
          local flip = false
          if flr(unit.lifetime / 8) % 2 == 0 then
              flip = true
@@ -181,7 +176,6 @@
  
  
  -- Bosses
- -- Carrier - Flies to exit and spawns drones on the way
  unit_types_list['Carrier'] = {
      name = 'Carrier',
      type = 'boss',
@@ -198,31 +192,23 @@
      movement_type = 'fly',
      weakness = 'bomb',
      strength = 'pixel',
-     spawn_time = 100, -- /30 seconds
+     spawn_time = 100,
      init = function(unit)
         unit.health_max = unit.health
         spawned_boss = unit
      end,
      draw = function(unit, x, y)
-         -- Draw Carrier next wave image
+         -- Next wave image
          if not unit.ability_cooldown then
              spr(26, x, y)
              return
          end
  
-         -- Flip sprite
-         local flip = false
-         -- if flr(unit.lifetime / 16) % 2 == 0 then
-         --     flip = true
-         -- end
- 
          if unit.ability_cooldown >= 30 then
-             sspr(88 + (flr(unit.lifetime / 15) % 2) * 16, 0, 16, 16, x - 4, y - 8, 16, 16, flip)
+             sspr(88 + (flr(unit.lifetime / 15) % 2) * 16, 0, 16, 16, x - 4, y - 8, 16, 16)
          else
-             -- Spawning animation
-             sspr(88 + (flr((29 - unit.lifetime) / 15) % 2) * 16, 16, 16, 16, x - 4, y - 8, 16, 16, flip)
+             sspr(88 + (flr((29 - unit.lifetime) / 15) % 2) * 16, 16, 16, 16, x - 4, y - 8, 16, 16)
          end
-         -- rect(x, y, x + 7, y + 7, 2)
      end,
      update = function(unit)
         if not wave_running then
@@ -256,13 +242,11 @@
      strength = nil,
      path_iterations = 10,
      draw = function(unit, x, y)
-         -- Draw Drone
          spr(39 + flr(unit.lifetime / 3) % 2, x, y)
      end
  }
  
  -- BigBoy
- -- Slow massive health pool. Occasionally jumps over a tower directly to it's south
  unit_types_list['BigBoy'] = {
      name = 'BigBoy',
      type = 'boss',
@@ -292,13 +276,12 @@
      weakness = 'laser',
      strength = 'bomb',
      draw = function(unit, x, y)
-         -- Flip sprite
          local flip = false
          if flr(unit.lifetime / 16) % 2 == 0 and (not unit.movement_type or unit.movement_type == 'walk') then
              flip = true
          end
  
-         -- Draw Carrier next wave image
+         -- Next wave image
          if not unit.ability_cooldown then
              spr(74, x, y)
              return
@@ -330,7 +313,6 @@
                      -- Jump it
                      unit.ability_cooldown = 50
                      unit.movement_type = 'fly'
-                    --  local owned_cell = unit.path[unit.path_index]
                      grid[unit.x][unit.y].unit_id = nil
                      unit.x_lock = unit.px
                  end

@@ -2,14 +2,12 @@
 cursor = {x = 0, y = 0}
 cursor_color_timer = 0
 cursor_color_index = 1
-cursor_colors = {8, 9, 10, 11} -- Red, Blue, Yellow, Green
+cursor_colors = {8, 9, 10, 11}
 cursor_size = 0
 cursor_cannot_build_timer = 0
 
--- Update cursor movement and interactions
 function update_cursor()
     if game_state == 'normal' then
-        -- Interactions
         if btnp(0) then
             cursor.x -= 1
             cursor_cannot_build_timer = 0
@@ -28,13 +26,13 @@ function update_cursor()
         end -- Down
 
         
-        if btnp(4) then -- Button O (typically Z key)
+        if btnp(4) then
             local tower = get_tower_at(cursor.x, cursor.y)
             if tower then
                 game_state = 'sell_menu'
                 tower_menu_open_delay = 5
             end
-        elseif btnp(5) then -- Button X (typically X key)
+        elseif btnp(5) then
             game_state = 'tower_menu'
             tower_menu_index = 1
             tower_menu_open_delay = 5
@@ -49,26 +47,22 @@ function update_cursor()
         mid((cursor.y - 1)*CELL_SIZE - (SCREEN_HEIGHT/2 - CELL_SIZE/2), -HUD_HEIGHT, GRID_HEIGHT*CELL_SIZE - SCREEN_HEIGHT)
     )
 
-    -- Cursor size change
     if game_state ~= 'normal' then
         cursor_size = (cursor_size - 1) % 10
     else
         cursor_size = 0
     end
 
-    -- Cursor cannot build
     if cursor_cannot_build_timer > 0 then
         cursor_cannot_build_timer -= 1
     end
 
-    -- Cursor color cycling
     cursor_color_timer = (cursor_color_timer + 1) % 4
     if cursor_color_timer == 0 then
         cursor_color_index = (cursor_color_index % #cursor_colors) + 1
     end
 end
 
--- Cursor drawing
 function draw_cursor()
     local color = cursor_colors[cursor_color_index]
     local x = (cursor.x - 1) * CELL_SIZE

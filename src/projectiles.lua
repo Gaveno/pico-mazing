@@ -2,10 +2,9 @@
 projectiles = {}
 explosions = {}
 
--- Create projectiles from tower
 function create_projectile(tower, target_unit)
     local lifetime = 60
-    if tower.type.attack_type == 'laser' then -- 'laser'
+    if tower.type.attack_type == 'laser' then
         lifetime = 10
     else -- if tower.type.attack_type == 'pixel' then
         sfx(1, 1, 0, 4)
@@ -20,22 +19,20 @@ function create_projectile(tower, target_unit)
         splash = tower.type.splash,
         range = tower.type.attack_range,
         lifetime = 0,
-        max_lifetime = lifetime -- Adjust as needed
+        max_lifetime = lifetime
     }
     add(projectiles, projectile)
-    -- printh("Created projectile: "..tower.type.attack_type.." total: "..#projectiles)
 end
 
--- Update projectiles (movement and collisions)
 function update_projectiles()
     for i = #projectiles, 1, -1 do
         local proj = projectiles[i]
         proj.lifetime += 1
 
-        if proj.type == 'pixel' or proj.type == 'bomb' then -- pixel shot or 'bomb'
+        if proj.type == 'pixel' or proj.type == 'bomb' then
             move_projectile(proj)
             check_projectile_collision(proj)
-        elseif proj.type == 'laser' then -- 'laser'
+        elseif proj.type == 'laser' then
             -- 'laser' is instantaneous
             if proj.lifetime % 3 == 0 then
                 apply_unit_damage(proj)
@@ -49,7 +46,6 @@ function update_projectiles()
     end
 end
 
--- Function to move projectiles
 function move_projectile(proj)
     local dx = proj.target.px + CELL_SIZE / 2 - proj.x
     local dy = proj.target.py + CELL_SIZE / 2 - proj.y
@@ -65,7 +61,6 @@ function move_projectile(proj)
     end
 end
 
--- Function to check projectile collisions
 function check_projectile_collision(proj)
     local dx = proj.target.px + CELL_SIZE / 2 - proj.x
     local dy = proj.target.py + CELL_SIZE / 2 - proj.y
@@ -84,13 +79,6 @@ function check_projectile_collision(proj)
     end
 end
 
--- Function to apply 'laser' damage
--- function apply_'laser'_damage(proj)
---     local target_unit = proj.target
---     target_unit.health -= proj.attack_power
---     -- Optionally, apply effects or animations
--- end
-
 function apply_unit_damage(proj)
     local target_unit = proj.target
     local multiplier = 1
@@ -103,7 +91,6 @@ function apply_unit_damage(proj)
     target_unit.health -= proj.attack_power * multiplier
 end
 
--- Function to create an explosion and apply splash damage
 function create_explosion(x, y, radius_cells, attack_power, exclude)
     local explosion = {
         x = x,
@@ -111,8 +98,8 @@ function create_explosion(x, y, radius_cells, attack_power, exclude)
         radius = radius_cells * CELL_SIZE,
         attack_power = attack_power,
         lifetime = 0,
-        max_lifetime = 15, -- Adjust duration as needed
-        color = 9, -- Explosion color (red/orange)
+        max_lifetime = 15,
+        color = 9,
     }
     add(explosions, explosion)
 
@@ -151,21 +138,15 @@ function calculate_splash_damage(max_radius, distance, attack_power, radius_cell
             damage = attack_power / 3
         end
     end
-    -- Optionally, adjust damage based on distance
-    -- For a gradual falloff:
-    -- damage = attack_power * (1 - (distance / max_radius))
-    -- Clamp damage to a minimum value if needed
     return damage
 end
 
--- Drawing Projectiles
 function draw_projectiles()
     for proj in all(projectiles) do
         local x = proj.x
         local y = proj.y
         if proj.type == 'pixel' then
-            -- printh("Drawing pixel shot at: ("..x..","..y..")")
-            pset(x, y, 7) -- White pixel
+            pset(x, y, 7)
         elseif proj.type == 'bomb' then
             local yimage = proj.splash - 1
             palt(0, false)
@@ -177,8 +158,7 @@ function draw_projectiles()
             local ey = proj.target.py + CELL_SIZE / 2
 
             if proj.lifetime < proj.max_lifetime and proj.lifetime % 2 == 0 then
-                -- Draw 'laser' beam
-                line(x, y, ex, ey, 8) -- Red color
+                line(x, y, ex, ey, 8)
                 local r_base = 0
 
                 if proj.range == 40 then
@@ -210,7 +190,6 @@ end
 
 function draw_explosions()
     for explosion in all(explosions) do
-        -- local alpha = 1 - (explosion.lifetime / explosion.max_lifetime)
         local radius = explosion.radius * (explosion.lifetime / explosion.max_lifetime)
         circ(
             explosion.x,
@@ -218,7 +197,5 @@ function draw_explosions()
             radius,
             explosion.color
         )
-        -- Optional: Add transparency or fade effect if desired
-        -- Note: PICO-8 doesn't support true transparency, but you can simulate it using color palettes
     end
 end

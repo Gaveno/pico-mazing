@@ -107,14 +107,14 @@ end
 function get_neighbors(x, y)
     local neighbors = {}
     local directions = {
-        {dx = -1, dy = -1}, -- up-left
-        {dx =  0, dy = -1}, -- up
-        {dx =  1, dy = -1}, -- up-right
-        {dx = -1, dy =  0}, -- left
-        {dx =  1, dy =  0}, -- right
-        {dx = -1, dy =  1}, -- down-left
-        {dx =  0, dy =  1}, -- down
-        {dx =  1, dy =  1}, -- down-right
+        {dx = -1, dy = -1},
+        {dx =  0, dy = -1},
+        {dx =  1, dy = -1},
+        {dx = -1, dy =  0},
+        {dx =  1, dy =  0},
+        {dx = -1, dy =  1},
+        {dx =  0, dy =  1},
+        {dx =  1, dy =  1},
     }
 
     for _, dir in ipairs(directions) do
@@ -167,22 +167,4 @@ function in_open_list(list, x, y)
         end
     end
     return nil
-end
-
--- Draw paths for debugging
-function draw_path(path_index, path)
-    if path ~= nil then
-        for i = path_index, #path do
-            local node = path[i]
-            local x = (node.x - 1) * CELL_SIZE + CELL_SIZE / 2
-            local y = (node.y - 1) * CELL_SIZE + CELL_SIZE / 2
-            circfill(x, y, 2, 12)
-        end
-    end
-end
-
-function draw_unit_paths()
-    for unit in all(units) do
-        draw_path(unit.path_index, unit.path)
-    end
 end

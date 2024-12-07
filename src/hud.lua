@@ -18,7 +18,7 @@ function draw_hud()
         local hi = (i - 1) % 3
         local hx = hi * 8 + hi
         local hy = ceil(i / 3 - 1) * 8
-        spr(6, hx, hy) -- Heart
+        spr(6, hx, hy)
     end
 
     -- Draw diamonds
@@ -32,7 +32,7 @@ function draw_hud()
 
     for i = 0, total do
         local di = i % 8
-        local dx = 8 + di * 8 --+ di
+        local dx = 8 + di * 8
         local dy = flr(i / 8) * 8
         if tower_cost ~= 0 and tower_cost >= diamonds-i or i == 15 then
             dy += sin((diamond_wave - i) % 10 / 10)
@@ -41,7 +41,7 @@ function draw_hud()
         if i == 15 and diamonds > 15 then
             spr(23, SCREEN_WIDTH - dx, dy)
         else
-            spr(7, SCREEN_WIDTH - dx, dy) -- Diamond
+            spr(7, SCREEN_WIDTH - dx, dy)
         end
     end
 
@@ -49,12 +49,6 @@ function draw_hud()
     local hourglass_x = SCREEN_WIDTH / 2 - 12
     local hourglass_progress = max(0, (WAVE_PREP_TIME - wave_timer) / WAVE_PREP_TIME * 6)
     for i = 1, 6 do
-        -- 1 -> x + 1, 6 0-17%, 17-100%
-        -- 2 -> x + 1, 6 0-33%, 33-100%
-        -- 3 -> x + 2, 4 0-49%, 49-100%
-        -- 4 -> x + 2, 4 0-65%, 65-100%
-        -- 5 -> x + 3, 2 0-81%, 81-100%
-        -- 6 -> x + 3, 2 0-100%, 99-100%
         -- Top
         if hourglass_progress < i-0.5 then
             line(hourglass_x + ceil(i/2), i, hourglass_x + 7 - ceil(i/2), i, 14)

@@ -10,14 +10,12 @@ MIN_TOWER_ATTACK_SPEED = 20 / 3
 MAX_TOWER_ATTACK_SPEED = 80
 SCALE_TOWER_ATTACK_SPEED = (MAX_TOWER_ATTACK_SPEED - MIN_TOWER_ATTACK_SPEED)
 
-
 -- Variables
 tower_menu_index = 1
 towers = {}
 tower_menu_shake = 0
 tower_menu_open_delay = 0
 
--- Tower Update Functions
 function update_towers()
     for _, tower in pairs(towers) do
         if tower.cooldown > 0 then

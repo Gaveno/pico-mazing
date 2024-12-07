@@ -1,8 +1,7 @@
 -- Variables
-building_coroutine = nil -- trying to find path when not nil
+building_coroutine = nil
 found_build_path = false
 
--- Update tower menu interactions
 function update_tower_menu()
     process_tower_build_path(building_coroutine)
     if building_coroutine ~= nil then
@@ -57,9 +56,8 @@ function update_sell_menu()
     end
 end
 
--- Function to build a tower at a specific location
 function build_tower(x, y, tower_type)
-    sfx(0, 0, 0, 6) -- build sound
+    sfx(0, 0, 0, 6)
 
     towers_built += 1
 
@@ -75,24 +73,18 @@ function build_tower(x, y, tower_type)
     check_invalid_nodes = true
 end
 
--- Function to sell a tower at a specific location
 function sell_tower(x, y)
     local tower = get_tower_at(x, y)
     if tower then
-        -- Refund diamonds
         local refund = ceil(tower.type.cost * 0.75)
         diamonds += refund
         towers_sold += 1
-
-        -- Remove tower
         towers[x .. ',' .. y] = nil
     end
 end
 
--- Check if a tower can be built at the specified location
 function can_build_tower_at(x, y)
     if grid[x][y].can_build and grid[x][y].unit_id == nil and get_tower_at(x, y) == nil then
-        -- Check if path from spawn to exit exists after building the tower
         towers[x .. ',' .. y] = {
             x = x,
             y = y,
@@ -106,11 +98,9 @@ function can_build_tower_at(x, y)
     else
         game_state = 'normal'
         cursor_cannot_build_timer = 30
-        printh("Could not build tower at ("..x..","..y..")")
     end
 end
 
--- Keep processing build attempt
 function process_tower_build_path(path_co)
     if not found_build_path then
         if building_coroutine ~= nil then
@@ -129,7 +119,6 @@ function process_tower_build_path(path_co)
     end
 end
 
--- Tower Draw Functions
 function draw_towers()
     for key, tower in pairs(towers) do
         local x = (tower.x - 1) * CELL_SIZE
