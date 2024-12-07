@@ -49,8 +49,8 @@ function update_projectiles()
 end
 
 function move_projectile(proj)
-    local dx = proj.target.px + CELL_SIZE / 2 - proj.x + proj.xto
-    local dy = proj.target.py + CELL_SIZE / 2 - proj.y + proj.yto
+    local dx = proj.target.px - proj.x + proj.xto
+    local dy = proj.target.py - proj.y + proj.yto
     local dist = sqrt(dx * dx + dy * dy)
     local speed = proj.speed
 
@@ -58,8 +58,8 @@ function move_projectile(proj)
         proj.x += dx / dist * speed
         proj.y += dy / dist * speed
     else
-        proj.x = proj.target.px + CELL_SIZE / 2 + proj.xto
-        proj.y = proj.target.py + CELL_SIZE / 2 + proj.yto
+        proj.x = proj.target.px + proj.xto
+        proj.y = proj.target.py + proj.yto
         projectile_collision(proj)
     end
 end
@@ -77,24 +77,6 @@ function projectile_collision(proj)
     end
     del(projectiles, proj)
 end
-
--- function check_projectile_collision(proj)
---     local dx = proj.target.px + CELL_SIZE / 2 - proj.x
---     local dy = proj.target.py + CELL_SIZE / 2 - proj.y
---     local dist = sqrt(dx * dx + dy * dy)
-
---     if dist <= proj.speed then
---         -- Collision occurred
---         if proj.splash > 0 then
---             apply_unit_damage(proj)
---             create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
---             sfx(3, 0, 0, 3)
---         else
---             apply_unit_damage(proj)
---         end
---         del(projectiles, proj)
---     end
--- end
 
 function apply_unit_damage(proj)
     local target_unit = proj.target
@@ -171,8 +153,8 @@ function draw_projectiles()
             sspr(48 + (flr(proj.lifetime / 4) % 2) * 4, 8 + yimage * 4, 4, 4, x-1, y-1)
             palt()
         elseif proj.type == 'laser' then
-            local ex = proj.target.px + CELL_SIZE / 2
-            local ey = proj.target.py + CELL_SIZE / 2
+            local ex = proj.target.px + proj.xto
+            local ey = proj.target.py + proj.yto
 
             if proj.lifetime < proj.max_lifetime and proj.lifetime % 2 == 0 then
                 line(x, y, ex, ey, 8)
