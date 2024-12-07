@@ -5,6 +5,7 @@ title_lines = {}
 title_line_spawn = 0
 title_transition = false
 show_game_name = false
+game_difficulty = -1
 
 -- Playthrough Stats
 units_killed = 0
@@ -33,6 +34,7 @@ function _init()
     title_line_spawn = 0
     title_transition = false
     game_state = 'title'
+    game_difficulty = -1
     cursor = {x = GRID_WIDTH/2, y = GRID_HEIGHT-4}
     next_unit_type = unit_types_list['Walker']
     wave_spawning_unit_type = next_unit_type
@@ -122,8 +124,13 @@ function update_title()
         if title_line_spawn > 0 then
             title_line_spawn -= 1
         else
-            game_state = 'normal'
-            title_lines = {}
+            if game_difficulty == -1 then
+                title_transition = false
+                game_difficulty = 0
+            else
+                game_state = 'normal'
+                title_lines = {}
+            end
         end
     end
 
@@ -159,6 +166,9 @@ function update_title()
         sfx(5, 0, 0, 18)
     end
 
+    if game_difficulty ~= -1 and (btnp(2) or btnp(3)) then
+        game_difficulty = (game_difficulty + 1) % 2
+    end
 end
 
 
@@ -177,10 +187,6 @@ function _draw()
     end
     draw_cursor()
 
-    -- sprr(0, 8, 8, 0)
-    -- sprr(0, 8, 16, 1)
-    -- sprr(0, 8, 24, 2)
-    -- sprr(0, 8, 32, 3)
     if game_state == 'title' then
         draw_title()
         return
@@ -219,13 +225,30 @@ function draw_title()
     spr(128, 6, -sin(percent_range(title_y, 0, 30) / 4) * 30, 15, 4)
     palt()
 
-    if title_y >= 30 then
+    if title_y >= 30 and game_difficulty == -1 then
         if not title_transition or title_line_spawn % 2 == 0 then
-            for i = 0, 12, 1 do
-                circfill(37 + i * 4, 80 + 4 * (i + 1) % 3, 5, 7)
-            end
+            -- for i = 0, 12, 1 do
+            --     circfill(37 + i * 4, 80 + 4 * (i + t()) % 3, 5, 7)
+            -- end
+            draw_selector(12, 37, 80)
             print("press x or o", 37, 80, 0)
         end
+    end
+
+    if game_difficulty >= 0 then
+        draw_selector(6, 50, 80 + 12 * game_difficulty)
+        print("normal", 52, 80, 0)
+        print("hard", 55, 92, 0)
+        -- if not title_transition or title_line_spawn % 2 == 0 then
+        --     draw_selector(12, 37, 80)
+        --     print("press x or o", 37, 80, 0)
+        -- end
+    end
+end
+
+function draw_selector(width, x, y)
+    for i = 0, width, 1 do
+        circfill(x + i * 4, y + 4 * (i + t()) % 3, 5, 7)
     end
 end
 

@@ -28,6 +28,7 @@ function spawn_unit(unit_type, x, y)
             path_invalid_node = nil,
             dir = 0.75,
         }
+        unit.health += game_difficulty * unit.health * 0.4
 
         -- Initialize if has init function
         if unit.type.init then
@@ -116,13 +117,10 @@ function move_walking_unit(unit, unit_path_delay)
     -- Keep processing path
     if unit.path_coroutine ~= nil then
         local new_path = nil
-        -- printh("Processing coroutine")
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
-            -- printh("Found path from coroutine")
             unit.path_index = 2 -- Start at beginning of path once found
             if unit.path ~= nil then
-                -- grid[unit.x][unit.y].unit_id = nil
                 unit.path_index = get_common_node(unit.x, unit.y, new_path)
             end
 
@@ -195,12 +193,12 @@ function check_invalid_path(unit)
     if not unit.path then -- or unit.path_invalid_node ~= nil then
     -- not check_invalid_nodes then -- unit.path_coroutine ~= nil then
         -- Already looking for new path or not needed
-        if not unit.path then
-            printh("Unit path exists")
-        end
-        if unit.path_invalid_node ~= nil then
-            printh("Unit has invalid node")
-        end
+        -- if not unit.path then
+        --     printh("Unit path exists")
+        -- end
+        -- if unit.path_invalid_node ~= nil then
+        --     printh("Unit has invalid node")
+        -- end
         return
     end
 
@@ -208,11 +206,11 @@ function check_invalid_path(unit)
     -- printh("Nilling coroutine")
     unit.path_coroutine = nil
 
-    printh("-- Checking a path --")
+    -- printh("-- Checking a path --")
     for i = unit.path_index + 1, #unit.path, 1 do
         local node = unit.path[i]
         if get_tower_at(node.x, node.y) ~= nil then
-            printh("Non-diagonal node invalid: " .. i)
+            -- printh("Non-diagonal node invalid: " .. i)
             unit.path_invalid_node = i
             return
         else
@@ -221,14 +219,14 @@ function check_invalid_path(unit)
             if prev_node.x ~= node.x and prev_node.y ~= node.y then
                 -- Is a diagonal
                 if get_tower_at(prev_node.x, node.y) ~= nil or get_tower_at(node.x, prev_node.y) ~= nil then
-                    printh("Diagonal node invalid: " .. i)
+                    -- printh("Diagonal node invalid: " .. i)
                     unit.path_invalid_node = i
                     return
                 end
             end
         end
     end
-    printh("-- Path has not been invalidated --")
+    -- printh("-- Path has not been invalidated --")
 end
 
 function get_common_node(node_from_x, node_from_y, path_to)
@@ -284,8 +282,10 @@ end
 
 -- Unit Drawing
 function draw_units()
-    for unit in all(units) do
-        draw_unit_path(unit)
+    if game_difficulty == 0 then
+        for unit in all(units) do
+            draw_unit_path(unit)
+        end
     end
 
     -- if not wave_running then
