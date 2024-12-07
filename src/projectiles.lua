@@ -19,7 +19,9 @@ function create_projectile(tower, target_unit)
         splash = tower.type.splash,
         range = tower.type.attack_range,
         lifetime = 0,
-        max_lifetime = lifetime
+        max_lifetime = lifetime,
+        xto = 2 + flr(rnd(4)),
+        yto = 2 + flr(rnd(4))
     }
     add(projectiles, projectile)
 end
@@ -31,7 +33,7 @@ function update_projectiles()
 
         if proj.type == 'pixel' or proj.type == 'bomb' then
             move_projectile(proj)
-            check_projectile_collision(proj)
+            -- check_projectile_collision(proj)
         elseif proj.type == 'laser' then
             -- 'laser' is instantaneous
             if proj.lifetime % 3 == 0 then
@@ -47,8 +49,8 @@ function update_projectiles()
 end
 
 function move_projectile(proj)
-    local dx = proj.target.px + CELL_SIZE / 2 - proj.x
-    local dy = proj.target.py + CELL_SIZE / 2 - proj.y
+    local dx = proj.target.px + CELL_SIZE / 2 - proj.x + proj.xto
+    local dy = proj.target.py + CELL_SIZE / 2 - proj.y + proj.yto
     local dist = sqrt(dx * dx + dy * dy)
     local speed = proj.speed
 
@@ -56,28 +58,43 @@ function move_projectile(proj)
         proj.x += dx / dist * speed
         proj.y += dy / dist * speed
     else
-        proj.x = proj.target.px + CELL_SIZE / 2
-        proj.y = proj.target.py + CELL_SIZE / 2
+        proj.x = proj.target.px + CELL_SIZE / 2 + proj.xto
+        proj.y = proj.target.py + CELL_SIZE / 2 + proj.yto
+        projectile_collision(proj)
     end
 end
 
-function check_projectile_collision(proj)
-    local dx = proj.target.px + CELL_SIZE / 2 - proj.x
-    local dy = proj.target.py + CELL_SIZE / 2 - proj.y
-    local dist = sqrt(dx * dx + dy * dy)
+function projectile_collision(proj)
+    apply_unit_damage(proj)
+    if proj.splash > 0 then
+        create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
 
-    if dist <= proj.speed then
-        -- Collision occurred
-        if proj.splash > 0 then
-            apply_unit_damage(proj)
-            create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
-            sfx(3, 0, 0, 3)
-        else
-            apply_unit_damage(proj)
+        local so = 0
+        if proj.splash == 1 then
+            so = 1
         end
-        del(projectiles, proj)
+        sfx(3, 0, so, 3 - so)
     end
+    del(projectiles, proj)
 end
+
+-- function check_projectile_collision(proj)
+--     local dx = proj.target.px + CELL_SIZE / 2 - proj.x
+--     local dy = proj.target.py + CELL_SIZE / 2 - proj.y
+--     local dist = sqrt(dx * dx + dy * dy)
+
+--     if dist <= proj.speed then
+--         -- Collision occurred
+--         if proj.splash > 0 then
+--             apply_unit_damage(proj)
+--             create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
+--             sfx(3, 0, 0, 3)
+--         else
+--             apply_unit_damage(proj)
+--         end
+--         del(projectiles, proj)
+--     end
+-- end
 
 function apply_unit_damage(proj)
     local target_unit = proj.target

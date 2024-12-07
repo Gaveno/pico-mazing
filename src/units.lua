@@ -26,6 +26,7 @@ function spawn_unit(unit_type, x, y)
             ability_cooldown = 0,
             path_invalid_node = nil,
             dir = 0.75,
+            tx = flr(rnd(4))
         }
         unit.health += game_difficulty * unit.health * 0.4
 
@@ -84,7 +85,7 @@ function update_units()
         end
 
         -- Check if the unit has reached the exit
-        if unit.y >= GRID_HEIGHT and unit.x > GRID_WIDTH/2 - 1 and unit.x <= GRID_WIDTH/2 + 1 then
+        if unit.y >= GRID_HEIGHT and unit.x >= EXIT_X and unit.x <= EXIT_X + 3 then
             lives -= lookup(unit.type, 'damage', 1)
             remove_unit(unit)
 
@@ -104,7 +105,7 @@ function move_walking_unit(unit, unit_path_delay)
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
 
         unit.path_coroutine = find_path_coroutine(
-            unit.x, unit.y, EXIT_X, EXIT_Y, lookup(unit.type, 'path_iterations', 13 - #units)
+            unit.x, unit.y, EXIT_X + unit.tx, EXIT_Y, lookup(unit.type, 'path_iterations', 13 - #units)
         )
         unit_path_delay = 40
     end
@@ -249,7 +250,7 @@ function remove_unit(unit)
     unit.health = 0
     del(units, unit)
 
-    if #units <= 0 then
+    if #units <= 0 and wave_number <= 30 then
         wave_running = false
         prep_wave()
     end

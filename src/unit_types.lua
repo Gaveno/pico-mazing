@@ -322,7 +322,7 @@
             unit.px = unit.x_lock
             if unit.ability_cooldown == 0 then
                  -- Flying over tower
-                 local land_x = ceil((unit.px) / CELL_SIZE)
+                 local land_x = ceil((unit.px + 4) / CELL_SIZE)
                  local land_y = ceil((unit.py + 4) / CELL_SIZE)
  
                  if get_tower_at(land_x, land_y) == nil then
