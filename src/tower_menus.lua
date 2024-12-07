@@ -93,7 +93,7 @@ function can_build_tower_at(x, y)
         }
         local spawn_x = flr(GRID_WIDTH / 2)
         local spawn_y = 1
-        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X, EXIT_Y, 15)
+        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X + 2, EXIT_Y, 15)
         found_build_path = false
     else
         game_state = 'normal'
@@ -219,16 +219,15 @@ function draw_sell_menu()
     local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
     local y = mid(0, (cursor.y - 1) * CELL_SIZE - 10, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
 
-    -- Draw menu background
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
-
-    -- Draw tower being sold
     local tower = get_tower_at(cursor.x, cursor.y)
-    tower.type.draw({cooldown = 0, type = tower.type}, x + 2, y + 2)
+    tower.type.draw({cooldown = 0, type = tower.type}, x + 2, y + 14)
+    spr(2, x + 10, y + 14)
+    print("sell", x + 2, y + 4, 10)
+    line(x + 20, y + 2, x + 20, y + 24, 10)
 
-    -- Draw sell price
     local refund = ceil(tower.type.cost * 0.75)
     for i = 1, refund do
-        spr(7, x + 12 + (i - 1) * 8, y + 2)
+        spr(7, x + 22 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
 end
