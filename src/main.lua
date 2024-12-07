@@ -237,6 +237,8 @@ function draw_title()
         print("normal", 52, 80, 0)
         print("hard", 55, 92, 0)
     end
+
+    print("bY gAVIN AND jACE aTKIN", 20, 120, 7)
 end
 
 function draw_selector(width, x, y)
