@@ -25,18 +25,17 @@ function update_cursor()
             cursor_cannot_build_timer = 0
         end -- Down
 
-        
-        if btnp(4) then
+        if btnp(5) then
             local tower = get_tower_at(cursor.x, cursor.y)
             if tower then
                 game_state = 'sell_menu'
                 tower_menu_open_delay = 5
+            else
+                game_state = 'tower_menu'
+                tower_menu_index = 1
+                tower_menu_open_delay = 5
+                can_build_tower_at(cursor.x, cursor.y)
             end
-        elseif btnp(5) then
-            game_state = 'tower_menu'
-            tower_menu_index = 1
-            tower_menu_open_delay = 5
-            can_build_tower_at(cursor.x, cursor.y)
         end
     end
 
