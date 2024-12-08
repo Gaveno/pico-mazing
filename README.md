@@ -5,8 +5,6 @@ A maze tower defense game for the PICO-8 fantasy console.
 Build towers to take out waves of enemies and survive until the end. Creatively structure your maze to keep the enemies from reaching your base.
 
 ## Controls
-X: Build tower | Confirm tower selection | Confirm tower sell
-Z: Sell tower | Cancel tower selection | Cancel tower sell
+X: Build tower | Sell tower | Confirm
+Z: Cancel
 Arrows: Move cursor | Scroll tower selection
-
-## Roadmap

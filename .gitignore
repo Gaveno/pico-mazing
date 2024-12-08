@@ -1,9 +1,9 @@
-src/picomazing_*.bin/picomazing_*_linux.zip
-src/picomazing_*.bin/picomazing_*_osx.zip
-src/picomazing_*.bin/picomazing_*_raspi.zip
-src/picomazing_*.bin/picomazing_*_windows.zip
-src/*.bin/**
-src/*.p8.png
+*/picomazing_*.bin/picomazing_*_linux.zip
+*/picomazing_*.bin/picomazing_*_osx.zip
+*/picomazing_*.bin/picomazing_*_raspi.zip
+*/picomazing_*.bin/picomazing_*_windows.zip
+*/*.bin/**
+*/*.p8.png
 *.js
 *.html
 *.zip

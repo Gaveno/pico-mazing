@@ -3,6 +3,7 @@ version 42
 __lua__
 
 -- PICO-8 Maze Tower Defense Game
+-- Copyright (C) 2024 Gavin Atkin
 
 #include grid.lua
 #include cursor.lua
