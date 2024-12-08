@@ -6,6 +6,9 @@ title_line_spawn = 0
 title_transition = false
 show_game_name = false
 game_difficulty = -1
+exp_timer = 0
+exp_x = 0
+exp_y = 0
 
 -- Playthrough Stats
 units_killed = 0
@@ -60,6 +63,7 @@ function _update()
         update_projectiles()
         update_explosions()
         update_waves()
+        update_exp_fx()
     elseif game_state == 'tower_menu' then
         update_tower_menu()
     elseif game_state == 'sell_menu' then
@@ -171,6 +175,18 @@ function update_title()
     end
 end
 
+function update_exp_fx()
+    if exp_timer > 0 then
+        exp_timer -= 1
+        if exp_timer % 3 == 0 then
+            create_explosion(exp_x + rnd(16), exp_y + rnd(16), 2, 0, nil)
+        end
+
+        if exp_timer == 0 and lives <= 0 then 
+            game_state = 'defeat'
+        end
+    end
+end
 
 function _draw()
     cls(11)

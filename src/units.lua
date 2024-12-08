@@ -6,6 +6,10 @@ spawned_boss = nil
 check_invalid_nodes = false
 
 function spawn_unit(unit_type, x, y)
+    if exp_timer > 0 then
+        return
+    end
+
     local spawn_x = (x or ceil(rnd(GRID_WIDTH)))
     local spawn_y = (y or ceil(rnd(2)))
 
@@ -92,7 +96,9 @@ function update_units()
             remove_unit(unit)
 
             if lives <= 0 then
-                game_state = 'defeat'
+                exp_timer = 60
+                exp_x = (EXIT_X - 1) * CELL_SIZE + 8
+                exp_y = (GRID_HEIGHT - 2) * CELL_SIZE
             end
         end
     end
@@ -167,7 +173,7 @@ function move_unit_along_path(unit)
         unit.px = target_px
         unit.py = target_py
         local next_cell = unit.path[unit.path_index + 1]
-        if grid[next_cell.x][next_cell.y].unit_id == nil then
+        if next_cell and grid[next_cell.x][next_cell.y] and grid[next_cell.x][next_cell.y].unit_id == nil then
             -- Empty previous cell and update to next target
             grid[unit.x][unit.y].unit_id = nil
             unit.x = next_cell.x
@@ -242,6 +248,13 @@ end
 function remove_unit(unit)
     grid[unit.x][unit.y].unit_id = nil
     unit.health = 0
+
+    if unit.type.type == 'boss' then
+        exp_timer = 60
+        exp_x = unit.x - 4
+        exp_y = unit.y - 8
+    end
+
     del(units, unit)
 
     if #units <= 0 and wave_number <= 30 then
