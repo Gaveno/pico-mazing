@@ -26,7 +26,8 @@ function spawn_unit(unit_type, x, y)
             ability_cooldown = 0,
             path_invalid_node = nil,
             dir = 0.75,
-            tx = flr(rnd(4))
+            tx = flr(rnd(4)),
+            elite = wave_is_elite
         }
         unit.health += game_difficulty * unit.health * 0.4
 
@@ -85,8 +86,9 @@ function update_units()
         end
 
         -- Check if the unit has reached the exit
-        if unit.y >= GRID_HEIGHT and unit.x >= EXIT_X and unit.x <= EXIT_X + 3 then
+        if unit.py >= (GRID_HEIGHT - 2) * CELL_SIZE and unit.px >= (EXIT_X - 1) * CELL_SIZE and unit.px <= (EXIT_X + 2) * CELL_SIZE then
             lives -= lookup(unit.type, 'damage', 1)
+            create_explosion(unit.px + 4, unit.py + 4, 2, 0, nil)
             remove_unit(unit)
 
             if lives <= 0 then
@@ -234,14 +236,6 @@ function move_flying_unit(unit)
 
     unit.py += sin(unit.dir) * unit.type.speed(unit, wave_number) / 15
     unit.px += cos(unit.dir) * unit.type.speed(unit, wave_number) / 15
-
-    if unit.py >= ((GRID_HEIGHT - 1) * CELL_SIZE) then
-        remove_unit(unit)
-        lives -= lookup(unit.type, 'damage', 1)
-        if lives <= 0 then
-            game_state = 'defeat'
-        end
-    end
 end
 
 -- Clean up unit
@@ -294,7 +288,7 @@ function draw_unit_path(unit)
             c = 10
         end
 
-        for i = unit.path_index + 1, #unit.path, 1 do
+        for i = unit.path_index, #unit.path - 2, 1 do
             if unit.path[i - 1] ~= nil then
                 line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
                     unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c

@@ -63,9 +63,7 @@ function draw_hud()
 
     -- Draw next unit info
     if wave_number <= 30 then
-        wave_is_elite = (contains(elite_waves, wave_number))
-        next_unit_type.draw({lifetime = wave_timer}, 28, 0)
-        wave_is_elite = (contains(elite_waves, wave_number-1))
+        next_unit_type.draw({lifetime = wave_timer, elite = contains(elite_waves, wave_number)}, 28, 0)
         print("x"..(get_wave_unit_total(wave_number)), 38, 2, 7)
         spr(9, 28, 8)
         print(wave_number, 38, 11, 7)

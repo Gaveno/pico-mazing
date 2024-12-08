@@ -175,16 +175,12 @@ end
 function _draw()
     cls(11)
     draw_grid()
+    spr(96, 6 * CELL_SIZE, 18 * CELL_SIZE, 2, 2)
+    spr(96, 8 * CELL_SIZE, 18 * CELL_SIZE, 2, 2)
     draw_towers()
     draw_units()
     draw_projectiles()
     draw_explosions()
-    if lives > 3 then
-        spr(96, 6 * CELL_SIZE, 18 * CELL_SIZE, 2, 2)
-    end
-    if lives > 0 then
-        spr(96, 8 * CELL_SIZE, 18 * CELL_SIZE, 2, 2)
-    end
     if show_game_name then
         palt(0, false)
         palt(1, true)

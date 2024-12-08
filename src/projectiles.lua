@@ -68,12 +68,6 @@ function projectile_collision(proj)
     apply_unit_damage(proj)
     if proj.splash > 0 then
         create_explosion(proj.x, proj.y, proj.splash, proj.attack_power, proj.target)
-
-        local so = 0
-        if proj.splash == 1 then
-            so = 1
-        end
-        sfx(3, 0, so, 3 - so)
     end
     del(projectiles, proj)
 end
@@ -91,6 +85,12 @@ function apply_unit_damage(proj)
 end
 
 function create_explosion(x, y, radius_cells, attack_power, exclude)
+    local so = 0
+    if radius_cells == 1 then
+        so = 1
+    end
+    sfx(3, 0, so, 3 - so)
+    
     local explosion = {
         x = x,
         y = y,

@@ -25,7 +25,7 @@
     health = function(wave_number) return 8 * wave_number / 2 + flr(wave_number / 5) * 2 end,
     speed = function(unit, wave_number)
         local base = 4
-        if wave_is_elite then
+        if unit.elite then
             base += 2
         end
         return base + flr(wave_number / 5) * 2
@@ -40,7 +40,7 @@
              flip = true
          end
  
-         if wave_is_elite then
+         if unit.elite then
             pal({[10]=11, [4]=12})
          end
 
@@ -70,7 +70,7 @@
          end
 
          -- Draw elite version
-         if wave_is_elite then
+         if unit.elite then
             pal({[11]=8, [3]=4, [8]=11})
          end
  
@@ -84,7 +84,7 @@
      health = function(wave_number) return 4 * wave_number / 2 + flr(wave_number / 5) * 2 end,
      speed = function(unit, wave_number)
         local base = 4
-        if wave_is_elite then
+        if unit.elite then
             base += 2
         end
 
@@ -102,7 +102,7 @@
          end
 
          -- Draw elite version
-         if wave_is_elite then
+         if unit.elite then
             pal({[0]=3, [7]=0})
          end
  
