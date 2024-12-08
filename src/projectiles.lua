@@ -89,7 +89,7 @@ function create_explosion(x, y, radius_cells, attack_power, exclude)
     if radius_cells == 1 then
         so = 1
     end
-    sfx(3, 0, so, 3 - so)
+    sfx(3, 0, so+so, 3 - so)
     
     local explosion = {
         x = x,
@@ -98,7 +98,7 @@ function create_explosion(x, y, radius_cells, attack_power, exclude)
         attack_power = attack_power,
         lifetime = 0,
         max_lifetime = 15,
-        color = 9,
+        color = 10,
     }
     add(explosions, explosion)
 
@@ -120,6 +120,7 @@ function update_explosions()
     for i = #explosions, 1, -1 do
         local explosion = explosions[i]
         explosion.lifetime += 2
+        explosion.color = 10 - flr(percent_range(explosion.lifetime, 0, explosion.max_lifetime) * 2.5)
         if explosion.lifetime >= explosion.max_lifetime then
             del(explosions, explosion)
         end

@@ -131,6 +131,7 @@ function update_title()
             if game_difficulty == -1 then
                 title_transition = false
                 game_difficulty = 0
+                diff_sel = false
             else
                 game_state = 'normal'
                 title_lines = {}
@@ -179,7 +180,7 @@ function update_exp_fx()
     if exp_timer > 0 then
         exp_timer -= 1
         if exp_timer % 3 == 0 then
-            create_explosion(exp_x + rnd(16), exp_y + rnd(16), 2, 0, nil)
+            create_explosion(exp_x + rnd(16), exp_y + rnd(16), 1 + flr(rnd(3)), 0, nil)
         end
 
         if exp_timer == 0 and lives <= 0 then 
@@ -250,7 +251,7 @@ function draw_title()
         end
     end
 
-    if game_difficulty >= 0 then
+    if game_difficulty >= 0 and (not title_transition or title_line_spawn % 2 == 0) then
         draw_selector(6, 50, 80 + 12 * game_difficulty)
         print("normal", 52, 80, 0)
         print("hard", 55, 92, 0)

@@ -248,13 +248,6 @@ end
 function remove_unit(unit)
     grid[unit.x][unit.y].unit_id = nil
     unit.health = 0
-
-    if unit.type.type == 'boss' then
-        exp_timer = 60
-        exp_x = unit.x - 4
-        exp_y = unit.y - 8
-    end
-
     del(units, unit)
 
     if #units <= 0 and wave_number <= 30 then
@@ -265,6 +258,9 @@ function remove_unit(unit)
     -- Boss handling
     if unit == spawned_boss then
         spawned_boss = nil
+        exp_timer = 60 + flr(wave_number / 30) * 90
+        exp_x = unit.px - 4
+        exp_y = unit.py - 8
     end
 end
 
@@ -301,7 +297,7 @@ function draw_unit_path(unit)
             c = 10
         end
 
-        for i = unit.path_index, #unit.path - 2, 1 do
+        for i = unit.path_index + 1, #unit.path - 2, 1 do
             if unit.path[i - 1] ~= nil then
                 line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
                     unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
