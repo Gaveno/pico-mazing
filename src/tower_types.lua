@@ -8,7 +8,7 @@
 
 tower_types = {
     {
-        name = 'Triangle',
+        name = 'Laser',
         cost = 1,
         attack_type = 'laser',
         attack_power = 1,
@@ -27,7 +27,7 @@ tower_types = {
         end
     },
     {
-        name = 'Circle',
+        name = 'Pixel',
         cost = 3,
         attack_type = 'pixel',
         attack_power = 5,
@@ -46,7 +46,7 @@ tower_types = {
         end
     },
     {
-        name = 'Square',
+        name = 'Bomb',
         cost = 4,
         attack_type = 'bomb',
         attack_power = 5,
@@ -95,7 +95,7 @@ tower_types = {
         end
     },
     {
-        name = 'Stacked Triangle',
+        name = 'LaserL2',
         cost = 8,
         attack_type = 'laser',
         attack_power = 2,
@@ -114,7 +114,7 @@ tower_types = {
         end
     },
     {
-        name = 'Stacked Square',
+        name = 'BombL2',
         cost = 12,
         attack_type = 'bomb',
         attack_power = 8,
