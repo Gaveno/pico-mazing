@@ -23,7 +23,7 @@ function update_towers()
         end
 
         if tower.cooldown <= 0 and wave_running then
-            if tower.target_unit == nil or tower.target_unit.health <= 0 then
+            if tower.target_unit == nil or tower.target_unit.health <= 0 or lookup(tower.target_unit, 'invisible', false) then
                 tower.target_unit = find_nearest_unit_in_range(tower)
             elseif tower_distance_to_unit(tower, tower.target_unit) > tower.type.attack_range then
                 tower.target_unit = find_nearest_unit_in_range(tower)
@@ -51,7 +51,7 @@ function find_nearest_unit_in_range(tower)
     local nearest_distance = tower.type.attack_range + 1
     for unit in all(units) do
         local distance = tower_distance_to_unit(tower, unit)
-        if distance < nearest_distance then
+        if distance < nearest_distance and not lookup(unit, 'invisible', false) then
             nearest_unit = unit
             nearest_distance = distance
         end 

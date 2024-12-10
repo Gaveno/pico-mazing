@@ -253,7 +253,7 @@
      spawn_number = 1,
      damage = 6,
      health = function(wave_number) return 55 * wave_number / 2 + flr(wave_number / 5) * 70 end,
-     reward = 6,
+     reward = 8,
      speed = function(unit, wave_number)
          if unit.movement_type == 'fly' then
              if unit.ability_cooldown > 25 then
@@ -337,3 +337,71 @@
      end,
  }
  
+ -- Squeal Team 6
+ unit_types_list['ST6'] = {
+    name = 'ST6',
+    type = 'boss',
+    damage = 6,
+    spawn_number = 1,
+    reward = 10,
+    health = function(wave_number) return 45 * wave_number / 2 + flr(wave_number / 5) * 65 end,
+    speed = function(unit, wave_number)
+        if unit.anim > 0 and unit.anim < 45 then
+            return 0
+        end
+        return 5 + flr(wave_number / 5) * 2
+    end,
+    movement_type = 'walk',
+    weakness = 'pixel',
+    strength = 'laser',
+    init = function(unit)
+        unit.health_max = unit.health
+        unit.invis_timer = 0
+        unit.invisible = false
+        unit.charges = 3
+        unit.anim = 0
+        spawned_boss = unit
+    end,
+    update = function(unit, x, y)
+        if unit.health < unit.health_max / 4 * unit.charges and unit.invis_timer <= 0 and unit.anim == 0 then
+            -- Go invis
+            unit.invis_timer = 120
+            unit.charges -= 1
+        end
+
+        if unit.invis_timer > 0 then
+            if unit.anim < 45 then
+                unit.anim += 1
+            else
+                unit.invisible = true
+                unit.invis_timer -= 1
+            end
+        else
+            if unit.anim > 0 then
+                unit.invisible = false
+                unit.anim -= 1
+            end
+        end
+    end,
+    draw = function(unit, x, y)
+        -- Next wave image
+        palt(14, true)
+        palt(0, false)
+        if not unit.invis_timer then
+            spr(90, x, y)
+            palt()
+            return
+        end
+
+        palt(14, true)
+        local flip = false
+        if flr(unit.lifetime / 6) % 2 == 0 and unit.anim == 0 then
+            flip = true
+        end
+
+        if not unit.invisible then
+            spr(98 + 2 * flr(unit.anim / 46 * 5), x - 4, y - 8, 2, 2, flip, false)
+        end
+        palt()
+    end
+}

@@ -1,5 +1,5 @@
 -- Constants
-WAVE_PREP_TIME = 450 -- 15 seconds (PICO-8 runs at 30 FPS)
+WAVE_PREP_TIME = 450
 
 -- Variables
 wave_number = 1
@@ -8,7 +8,7 @@ wave_units_to_spawn = 0
 wave_spawning_unit_type = nil
 wave_is_elite = false
 wave_running = false
-elite_waves = {7, 13, 19, 23, 27}
+elite_waves = {7, 13, 18, 23, 27, 34}
 
 -- Update wave timing and spawning units
 function update_waves()
@@ -21,7 +21,7 @@ function update_waves()
     end
 
     -- Check if game has been won
-    if wave_number > 30 and #units == 0 and game_state == 'normal' and exp_timer <= 0 then
+    if wave_number > 35 and #units == 0 and game_state == 'normal' and exp_timer <= 0 then
         wave_number += 1
         game_state = 'victory'
     end
@@ -30,10 +30,10 @@ function update_waves()
         wave_timer -= 1
     end
 
-    if wave_timer <= 0 and wave_number <= 30 then
+    if wave_timer <= 0 and wave_number <= 35 then
         start_wave()
         wave_number += 1
-        if wave_number <= 30 then
+        if wave_number <= 35 then
             wave_timer = WAVE_PREP_TIME
         end
     end
@@ -70,6 +70,8 @@ function get_next_unit_type()
         unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
     elseif next_wave == 15 or next_wave == 30 then
         unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
+    elseif next_wave == 20 or next_wave == 35 then
+        unit_probs = {{type = unit_types_list['ST6'], prob = 1.0},}
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
             {type = unit_types_list['Lizard'], prob = 0.37},

@@ -250,7 +250,7 @@ function remove_unit(unit)
     unit.health = 0
     del(units, unit)
 
-    if #units <= 0 and wave_number <= 30 then
+    if #units <= 0 and wave_number <= 35 then
         wave_running = false
         sfx(9, 3)
         fmsc = 0
@@ -260,7 +260,7 @@ function remove_unit(unit)
     -- Boss handling
     if unit == spawned_boss then
         spawned_boss = nil
-        exp_timer = 60 + flr(wave_number / 30) * 90
+        exp_timer = 60 + flr(wave_number / 35) * 90
         exp_x = unit.px - 4
         exp_y = unit.py - 8
     end

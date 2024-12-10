@@ -62,7 +62,7 @@ function draw_hud()
     spr(8, hourglass_x, 8, 1, 1, false, true)
 
     -- Draw next unit info
-    if wave_number <= 30 then
+    if wave_number <= 35 then
         next_unit_type.draw({lifetime = wave_timer, elite = contains(elite_waves, wave_number)}, 28, 0)
         print("x"..(get_wave_unit_total(wave_number)), 38, 2, 7)
         spr(9, 28, 8)
