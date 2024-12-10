@@ -9,6 +9,7 @@ game_difficulty = -1
 exp_timer = 0
 exp_x = 0
 exp_y = 0
+fmsc = 0
 
 -- Playthrough Stats
 units_killed = 0
@@ -42,6 +43,8 @@ function _init()
     next_unit_type = unit_types_list['Walker']
     wave_spawning_unit_type = next_unit_type
     title_y = -32
+    fmsc = 0
+    sfx(6, 3)
 
     -- Playthrough Stats
     units_killed = 0
@@ -134,6 +137,8 @@ function update_title()
                 diff_sel = false
             else
                 game_state = 'normal'
+                sfx(-2, 3)
+                sfx(9, 3)
                 title_lines = {}
             end
         end

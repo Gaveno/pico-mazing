@@ -30,6 +30,10 @@ function update_towers()
             end
 
             if tower.target_unit ~= nil then
+                if fmsc < 1 then
+                    sfx(6, 3)
+                    fmsc += 1
+                end
                 tower.cooldown = tower.type.attack_speed
 
                 if tower.type.custom_attack then

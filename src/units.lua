@@ -72,7 +72,7 @@ function update_units()
             end
             
             diamonds += lookup(unit.type, 'reward', 1)
-            sfx(4, 2, 0, 11)
+            sfx(4, 0, 0, 11)
             remove_unit(unit)
             return
         end
@@ -252,6 +252,8 @@ function remove_unit(unit)
 
     if #units <= 0 and wave_number <= 30 then
         wave_running = false
+        sfx(9, 3)
+        fmsc = 0
         prep_wave()
     end
 

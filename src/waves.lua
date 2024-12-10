@@ -49,6 +49,7 @@ end
 function start_wave()
     next_unit_type = get_next_unit_type()
     wave_running = true
+    sfx(-2, 3)
 end
 
 function get_wave_unit_total(wave)
