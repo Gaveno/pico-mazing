@@ -31,7 +31,9 @@ function update_waves()
     end
 
     if wave_timer <= 0 and wave_number <= 35 then
-        start_wave()
+        next_unit_type = get_next_unit_type()
+        wave_running = true
+        sfx(-2, 3)
         wave_number += 1
         if wave_number <= 35 then
             wave_timer = WAVE_PREP_TIME
@@ -44,12 +46,6 @@ function prep_wave()
     wave_spawning_unit_type = next_unit_type
     wave_units_to_spawn = lookup(wave_spawning_unit_type, 'spawn_number', get_wave_unit_total(wave_number))
     wave_units_to_spawn += flr(wave_number / 20) * game_difficulty
-end
-
-function start_wave()
-    next_unit_type = get_next_unit_type()
-    wave_running = true
-    sfx(-2, 3)
 end
 
 function get_wave_unit_total(wave)
@@ -67,11 +63,17 @@ function get_next_unit_type()
     }
 
     if next_wave == 10 or next_wave == 25 then
-        unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
+        return unit_types_list['Carrier']
+        -- unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
     elseif next_wave == 15 or next_wave == 30 then
-        unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
+        return unit_types_list['BigBoy']
+        -- unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
     elseif next_wave == 20 or next_wave == 35 then
-        unit_probs = {{type = unit_types_list['ST6'], prob = 1.0},}
+        -- unit_probs = {{type = unit_types_list['ST6'], prob = 1.0},}
+        return unit_types_list['ST6']
+    elseif next_wave == 7 or next_wave == 18 or next_wave == 34 then
+        return unit_types_list['Chicken']
+        -- unit_probs = {{type = unit_types_list['Chicken'], prob = 1.0},}
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
             {type = unit_types_list['Lizard'], prob = 0.37},
@@ -89,5 +91,5 @@ function get_next_unit_type()
         end
     end
 
-    return unit_probs[1].type -- Default to first type
+    return unit_probs[1].type
 end

@@ -125,7 +125,7 @@ tower_types = {
         proj_launch_x = 3,
         proj_launch_y = 3,
         draw = function(tower, x, y)
-            local image = tower.cooldown / (tower.type.attack_speed - 5) * 6
+            local image = 6 * tower.cooldown / (tower.type.attack_speed - 5)
             spr(52 + image, x, y)
         end
     }

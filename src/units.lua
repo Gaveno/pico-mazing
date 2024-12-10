@@ -27,7 +27,7 @@ function spawn_unit(unit_type, x, y)
             health = unit_type.health(wave_number),
             lifetime = 0,
             id = next_unit_id,
-            ability_cooldown = 0,
+            cooldown = 0,
             path_invalid_node = nil,
             dir = 0.75,
             tx = flr(rnd(4)),
@@ -90,15 +90,17 @@ function update_units()
         end
 
         -- Check if the unit has reached the exit
-        if unit.py >= (GRID_HEIGHT - 2) * CELL_SIZE and unit.px >= (EXIT_X - 1) * CELL_SIZE and unit.px <= (EXIT_X + 2) * CELL_SIZE then
+        -- if unit.py >= (GRID_HEIGHT - 2) * CELL_SIZE and unit.px >= (EXIT_X - 1) * CELL_SIZE and unit.px <= (EXIT_X + 2) * CELL_SIZE then
+        if unit.py >= 144 and unit.px >= 48 and unit.px <= 72 then
+
             lives -= lookup(unit.type, 'damage', 1)
             create_explosion(unit.px + 4, unit.py + 4, 2, 0, nil)
             remove_unit(unit)
 
             if lives <= 0 then
                 exp_timer = 60
-                exp_x = (EXIT_X - 1) * CELL_SIZE + 8
-                exp_y = (GRID_HEIGHT - 2) * CELL_SIZE
+                exp_x = 56
+                exp_y = 144
             end
         end
     end
@@ -113,7 +115,7 @@ function move_walking_unit(unit, unit_path_delay)
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
 
         unit.path_coroutine = find_path_coroutine(
-            unit.x, unit.y, EXIT_X + unit.tx, EXIT_Y, lookup(unit.type, 'path_iterations', 13 - #units)
+            unit.x, unit.y, EXIT_X + unit.tx, EXIT_Y, lookup(unit.type, 'path_iterations', 14 - #units)
         )
         unit_path_delay = 40
     end

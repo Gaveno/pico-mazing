@@ -42,7 +42,7 @@ function update_cursor()
     cursor.x = mid(1, cursor.x, GRID_WIDTH)
     cursor.y = mid(1, cursor.y, GRID_HEIGHT)
     camera(
-        mid((cursor.x - 1)*CELL_SIZE - (SCREEN_WIDTH/2 - CELL_SIZE/2), 0, GRID_WIDTH*CELL_SIZE - SCREEN_WIDTH),
+        0,
         mid((cursor.y - 1)*CELL_SIZE - (SCREEN_HEIGHT/2 - CELL_SIZE/2), -HUD_HEIGHT, GRID_HEIGHT*CELL_SIZE - SCREEN_HEIGHT)
     )
 
