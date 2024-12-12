@@ -148,8 +148,8 @@
             return
         end
 
-        local real_cell_x = ceil((unit.px + 4) / CELL_SIZE)
-        local real_cell_y = ceil((unit.py + 4) / CELL_SIZE)
+        local real_cell_x = ceil((unit.px) / CELL_SIZE)
+        local real_cell_y = ceil((unit.py) / CELL_SIZE)
 
         if unit.movement_type == 'walk' then
             -- Walking, ready to jump

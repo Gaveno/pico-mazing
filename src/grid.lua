@@ -42,7 +42,7 @@ function draw_grid()
             local py = (y - 1) * CELL_SIZE
             local cell = grid[x][y]
             spr(3 + (x + y) % 3, px, py)
-            if not cell.can_build then
+            if not cell.can_build or grid[x][y].unit_id ~= nil then
                 spr(19, px, py)
             end
         end
