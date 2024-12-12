@@ -135,7 +135,7 @@ function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
         unit.path_coroutine = find_path_coroutine(
-            unit.x, unit.y, EXIT_X + unit.tx, EXIT_Y, lookup(unit.type, 'path_iterations', 14 - #units)
+            EXIT_X + unit.tx, EXIT_Y, unit.x, unit.y, lookup(unit.type, 'path_iterations', 14 - #units)
         )
         unit_path_delay = 40
     end
@@ -145,7 +145,7 @@ function move_walking_unit(unit, unit_path_delay)
         local new_path = nil
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
-            unit.path_index = 2 -- Start at beginning of path once found
+            unit.path_index = #new_path -- Start at beginning of path once found
             if unit.path ~= nil then
                 unit.path_index = get_common_node(unit.x, unit.y, new_path)
             end
@@ -164,7 +164,7 @@ function move_unit_along_path(unit)
         return
     end
 
-    if unit.path_index > #unit.path or unit.path_invalid_node == unit.path_index then
+    if unit.path_index == 1 or unit.path_invalid_node == unit.path_index then
         unit.path = nil
         return
     end
@@ -187,12 +187,12 @@ function move_unit_along_path(unit)
     if dist < speed then
         unit.px = target_px
         unit.py = target_py
-        local next_cell = unit.path[unit.path_index + 1]
+        local next_cell = unit.path[unit.path_index - 1]
         if next_cell and grid[next_cell.x][next_cell.y] and grid[next_cell.x][next_cell.y].unit_id == nil then
             -- Empty previous cell and update to next target
             unit_claim_cell(unit, next_cell.x, next_cell.y)
             -- Claim next cell
-            unit.path_index += 1
+            unit.path_index -= 1
         end
     else
         unit.px += dx / dist * speed
@@ -212,14 +212,14 @@ function check_invalid_path(unit)
 
     -- If already looking for a path, wipe out progess
     unit.path_coroutine = nil
-    for i = unit.path_index + 1, #unit.path, 1 do
+    for i = unit.path_index - 1, 1, -1 do
         local node = unit.path[i]
         if get_tower_at(node.x, node.y) ~= nil then
             unit.path_invalid_node = i
             return
         else
             -- Check diagonals
-            local prev_node = unit.path[i - 1]
+            local prev_node = unit.path[i + 1]
             if prev_node.x ~= node.x and prev_node.y ~= node.y then
                 -- Is a diagonal
                 if get_tower_at(prev_node.x, node.y) ~= nil or get_tower_at(node.x, prev_node.y) ~= nil then
@@ -232,7 +232,7 @@ function check_invalid_path(unit)
 end
 
 function get_common_node(node_from_x, node_from_y, path_to)
-    for i = 1, #path_to, 1 do
+    for i = #path_to, 1, -1 do
         local tx = path_to[i].x
         local ty = path_to[i].y
         if node_from_x == tx and node_from_y == ty then
@@ -309,10 +309,10 @@ function draw_unit_path(unit)
             c = 10
         end
 
-        for i = unit.path_index + 1, #unit.path - 2, 1 do
-            if unit.path[i - 1] ~= nil then
+        for i = 1, unit.path_index - 1, 1 do
+            if unit.path[i + 1] ~= nil then
                 line(
-                    unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
+                    unit.path[i + 1].x * CELL_SIZE - 4, unit.path[i + 1].y * CELL_SIZE - 4,
                     unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
                 )
             end
