@@ -402,7 +402,7 @@
         local flip = get_flip(unit, 6) and unit.anim == 0
 
         if not unit.invisible then
-            spr(98 + 2 * flr(unit.anim * 1.08696), x - 4, y - 8, 2, 2, flip, false)
+            spr(98 + 2 * flr(unit.anim * 0.108696), x - 4, y - 8, 2, 2, flip, false)
         end
         palt()
     end

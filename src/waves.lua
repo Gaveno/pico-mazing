@@ -64,16 +64,12 @@ function get_next_unit_type()
 
     if next_wave == 10 or next_wave == 25 then
         return unit_types_list['Carrier']
-        -- unit_probs = {{type = unit_types_list['Carrier'], prob = 1.0},}
     elseif next_wave == 15 or next_wave == 30 then
         return unit_types_list['BigBoy']
-        -- unit_probs = {{type = unit_types_list['BigBoy'], prob = 1.0},}
     elseif next_wave == 20 or next_wave == 35 then
-        -- unit_probs = {{type = unit_types_list['ST6'], prob = 1.0},}
         return unit_types_list['ST6']
     elseif next_wave == 7 or next_wave == 18 or next_wave == 34 then
         return unit_types_list['Chicken']
-        -- unit_probs = {{type = unit_types_list['Chicken'], prob = 1.0},}
     elseif contains(elite_waves, next_wave) then
         unit_probs = {
             {type = unit_types_list['Lizard'], prob = 0.37},
