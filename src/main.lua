@@ -21,7 +21,6 @@ towers_sold = 0
 
 -- Initialize grid and game elements
 function _init()
-    printh("---- Game start ----")
     init_grid()
 
     -- Reset game variables

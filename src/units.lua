@@ -5,6 +5,29 @@ next_unit_id = 0
 spawned_boss = nil
 check_invalid_nodes = false
 
+-- Helper functions
+function get_flip(unit, d)
+    return get_image(unit, d) == 0
+end
+
+function get_image(unit, d)
+    return flr(unit.lifetime / d) % 2
+end
+
+function d_flr_m(v, d, m)
+    return flr(v / d) * m
+end
+
+function unit_claim_cell(unit, x, y)
+    grid[unit.x][unit.y].unit_id = nil
+    unit.x = x
+    unit.y = y
+    -- Claim next cell
+    grid[x][y].unit_id = unit.id
+end
+
+-- Main unit functions
+
 function spawn_unit(unit_type, x, y)
     if exp_timer > 0 then
         return
@@ -14,7 +37,6 @@ function spawn_unit(unit_type, x, y)
     local spawn_y = (y or ceil(rnd(2)))
 
     if grid[spawn_x][spawn_y].unit_id == nil then
-
         local unit = {
             x = spawn_x,
             y = spawn_y,
@@ -48,7 +70,8 @@ function spawn_unit(unit_type, x, y)
 
         return true -- Success
     end
-    return false -- Failed to spawn
+    return false
+    -- Failed to spawn
 end
 
 function update_units()
@@ -70,7 +93,7 @@ function update_units()
             elseif unit.type.type == 'boss' then
                 bosses_killed += 1
             end
-            
+
             diamonds += lookup(unit.type, 'reward', 1)
             sfx(4, 0, 0, 11)
             remove_unit(unit)
@@ -90,9 +113,7 @@ function update_units()
         end
 
         -- Check if the unit has reached the exit
-        -- if unit.py >= (GRID_HEIGHT - 2) * CELL_SIZE and unit.px >= (EXIT_X - 1) * CELL_SIZE and unit.px <= (EXIT_X + 2) * CELL_SIZE then
         if unit.py >= 144 and unit.px >= 48 and unit.px <= 72 then
-
             lives -= lookup(unit.type, 'damage', 1)
             create_explosion(unit.px + 4, unit.py + 4, 2, 0, nil)
             remove_unit(unit)
@@ -113,7 +134,6 @@ end
 function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
-
         unit.path_coroutine = find_path_coroutine(
             unit.x, unit.y, EXIT_X + unit.tx, EXIT_Y, lookup(unit.type, 'path_iterations', 14 - #units)
         )
@@ -134,10 +154,9 @@ function move_walking_unit(unit, unit_path_delay)
             unit.path_invalid_node = nil
         end
     end
-    
+
     move_unit_along_path(unit)
 end
-
 
 -- Function to move units along their paths
 function move_unit_along_path(unit)
@@ -151,12 +170,6 @@ function move_unit_along_path(unit)
     end
 
     local target_cell = unit.path[unit.path_index]
-    if target_cell.x ~= unit.x or target_cell.y ~= unit.y then
-        grid[unit.x][unit.y].unit_id = nil
-        unit.x = target_cell.x
-        unit.y = target_cell.y
-    end
-
     if get_tower_at(target_cell.x, target_cell.y) ~= nil then
         -- Invalidate path if blocked
         unit.path = nil
@@ -177,11 +190,8 @@ function move_unit_along_path(unit)
         local next_cell = unit.path[unit.path_index + 1]
         if next_cell and grid[next_cell.x][next_cell.y] and grid[next_cell.x][next_cell.y].unit_id == nil then
             -- Empty previous cell and update to next target
-            grid[unit.x][unit.y].unit_id = nil
-            unit.x = next_cell.x
-            unit.y = next_cell.y
+            unit_claim_cell(unit, next_cell.x, next_cell.y)
             -- Claim next cell
-            grid[unit.x][unit.y].unit_id = unit.id
             unit.path_index += 1
         end
     else
@@ -222,7 +232,6 @@ function check_invalid_path(unit)
 end
 
 function get_common_node(node_from_x, node_from_y, path_to)
-
     for i = 1, #path_to, 1 do
         local tx = path_to[i].x
         local ty = path_to[i].y
@@ -262,7 +271,7 @@ function remove_unit(unit)
     -- Boss handling
     if unit == spawned_boss then
         spawned_boss = nil
-        exp_timer = 60 + flr(wave_number / 35) * 90
+        exp_timer = 60 + d_flr_m(wave_number, 35, 90)
         exp_x = unit.px - 4
         exp_y = unit.py - 8
     end
@@ -281,7 +290,6 @@ function draw_units()
         local y = unit.py
         unit.type.draw(unit, x, y)
     end
-
 end
 
 -- Draw Boss Healthbar
@@ -303,7 +311,8 @@ function draw_unit_path(unit)
 
         for i = unit.path_index + 1, #unit.path - 2, 1 do
             if unit.path[i - 1] ~= nil then
-                line(unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
+                line(
+                    unit.path[i - 1].x * CELL_SIZE - 4, unit.path[i - 1].y * CELL_SIZE - 4,
                     unit.path[i].x * CELL_SIZE - 4, unit.path[i].y * CELL_SIZE - 4, c
                 )
             end

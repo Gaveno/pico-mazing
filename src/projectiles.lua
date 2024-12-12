@@ -6,7 +6,7 @@ function create_projectile(tower, target_unit)
     local lifetime = 60
     if tower.type.attack_type == 'laser' then
         lifetime = 10
-    else -- if tower.type.attack_type == 'pixel' then
+    else
         sfx(1, 0, 0, 4)
     end
     local projectile = {

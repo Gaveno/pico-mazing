@@ -2,6 +2,10 @@
 building_coroutine = nil
 found_build_path = false
 
+function tower_set(x, y, t)
+    towers[x .. ',' .. y] = t
+end
+
 function update_tower_menu()
     process_tower_build_path(building_coroutine)
     if building_coroutine ~= nil then
@@ -62,13 +66,13 @@ function build_tower(x, y, tower_type)
     towers_built += 1
 
     -- Place the tower
-    towers[x .. ',' .. y] = {
+    tower_set(x, y, {
         x = x,
         y = y,
         type = tower_type,
         cooldown = 0,
         target_unit = nil
-    }
+    })
     diamonds -= tower_type.cost
     check_invalid_nodes = true
 end
@@ -79,21 +83,21 @@ function sell_tower(x, y)
         local refund = ceil(tower.type.cost * 0.75)
         diamonds += refund
         towers_sold += 1
-        towers[x .. ',' .. y] = nil
+        tower_set(x, y, nil)
     end
 end
 
 function can_build_tower_at(x, y)
     if grid[x][y].can_build and grid[x][y].unit_id == nil and get_tower_at(x, y) == nil then
-        towers[x .. ',' .. y] = {
+        tower_set(x, y, {
             x = x,
             y = y,
             type = tower_types[1],
             cooldown = 0
-        }
-        local spawn_x = flr(GRID_WIDTH / 2)
+        })
+        local spawn_x = 8
         local spawn_y = 1
-        building_coroutine = find_path_coroutine(spawn_x, spawn_y, EXIT_X + 2, EXIT_Y, 15)
+        building_coroutine = find_path_coroutine(EXIT_X + 2, EXIT_Y, spawn_x, spawn_y, 15)
         found_build_path = false
     else
         game_state = 'normal'
@@ -108,13 +112,13 @@ function process_tower_build_path(path_co)
             building_coroutine, path = process_path_coroutine(building_coroutine)
 
             if path ~= nil then
-                towers[cursor.x .. ',' .. cursor.y] = nil
+                tower_set(cursor.x, cursor.y, nil)
                 found_build_path = true
             end
         else
             cursor_cannot_build_timer = 30
             game_state = 'normal'
-            towers[cursor.x .. ',' .. cursor.y] = nil
+            tower_set(cursor.x, cursor.y, nil)
         end
     end
 end
