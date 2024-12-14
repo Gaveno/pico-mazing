@@ -52,10 +52,10 @@ function spawn_unit(unit_type, x, y)
             cooldown = 0,
             path_invalid_node = nil,
             dir = 0.75,
-            tx = flr(rnd(4)),
+            tx = flr(rnd(3)),
             elite = wave_is_elite
         }
-        unit.health += game_difficulty * unit.health * 0.4
+        unit.health += game_difficulty * unit.health * 0.3
 
         if unit.type.init then
             unit.type.init(unit)
@@ -138,7 +138,7 @@ function move_walking_unit(unit, unit_path_delay)
     -- Start finding path
     if unit.path_coroutine == nil and (unit.path == nil or unit.path_invalid_node ~= nil) and unit_path_delay <= 0 then
         unit.path_coroutine = find_path_coroutine(
-            EXIT_X + unit.tx, EXIT_Y, unit.x, unit.y, lookup(unit.type, 'path_iterations', 14 - #units)
+            EXIT_X + unit.tx + 1, EXIT_Y, unit.x, unit.y, lookup(unit.type, 'path_iterations', 14 - #units)
         )
         unit_path_delay = 40
     end
@@ -149,9 +149,14 @@ function move_walking_unit(unit, unit_path_delay)
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
             unit.path_index = #new_path -- Start at beginning of path once found
+            if unit.path ~= nil then
+                unit.path_index = get_common_node(unit.x, unit.y, new_path)
+            end
             unit.path = new_path
             unit.path_invalid_node = nil
             check_invalid_path(unit)
+        elseif unit.path_coroutine == nil then
+            explode_tower(unit)
         end
     end
 
@@ -198,6 +203,36 @@ function move_unit_along_path(unit)
         unit.px += dx / dist * speed
         unit.py += dy / dist * speed
     end
+end
+
+function get_common_node(node_from_x, node_from_y, path_to)
+    for i = #path_to, 1, -1 do
+        local tx = path_to[i].x
+        local ty = path_to[i].y
+        local dist = abs(node_from_x - tx) + abs(node_from_y - ty)
+        if dist <= 1 then
+            return i
+        end
+    end
+    return #path_to
+end
+
+function explode_tower(unit)
+    for i = 1, GRID_HEIGHT do
+        if (explode_tower_at(unit.x - i, unit.y)) return
+        if (explode_tower_at(unit.x + i, unit.y)) return
+        if (explode_tower_at(unit.x, unit.y - i)) return
+        if (explode_tower_at(unit.x, unit.y + i)) return
+    end
+end
+
+function explode_tower_at(x, y)
+    if get_tower_at(x, y) then
+        tower_set(x, y, nil)
+        create_explosion(x, y, 3, 0, nil)
+        return true
+    end
+    return false
 end
 
 -- Check for path being invalid and recalculate if needed

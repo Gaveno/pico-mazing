@@ -27,15 +27,12 @@ function create_projectile(tower, target_unit)
 end
 
 function update_projectiles()
-    for i = #projectiles, 1, -1 do
-        local proj = projectiles[i]
+    for proj in all(projectiles) do
         proj.lifetime += 1
 
         if proj.type == 'pixel' or proj.type == 'bomb' then
             move_projectile(proj)
-            -- check_projectile_collision(proj)
         elseif proj.type == 'laser' then
-            -- 'laser' is instantaneous
             if proj.lifetime % 3 == 0 then
                 apply_unit_damage(proj)
                 sfx(2, 0, 0, 2)
@@ -117,8 +114,7 @@ function create_explosion(x, y, radius_cells, attack_power, exclude)
 end
 
 function update_explosions()
-    for i = #explosions, 1, -1 do
-        local explosion = explosions[i]
+    for explosion in all(explosions) do
         explosion.lifetime += 2
         explosion.color = 10 - flr(percent_range(explosion.lifetime, 0, explosion.max_lifetime) * 2.5)
         if explosion.lifetime >= explosion.max_lifetime then
@@ -166,7 +162,7 @@ function draw_projectiles()
                 end
 
                 circfill(ex, ey, 1 + r_base, 8)
-                circfill(ex, ey, 0 + r_base, 7)
+                circfill(ex, ey, r_base, 7)
             end
 
             -- More powerful laser gets added effect
@@ -176,7 +172,7 @@ function draw_projectiles()
                 local distance = sqrt(dx * dx + dy * dy)
                 local line_angle = atan2(dx, dy)
 
-                for i = 0, ceil(distance / 7), 1 do
+                for i = 0, ceil(distance / 7) do
                     local offset = i * (distance / 8) + proj.lifetime % 8
                     local ix = x + cos(line_angle) * offset
                     local iy = y + sin(line_angle) * offset

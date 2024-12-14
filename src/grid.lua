@@ -26,8 +26,8 @@ function init_grid()
             grid[x][y].can_build = false
         end
     end
-    local mid_start = flr(GRID_WIDTH / 2) - 1
-    local mid_end = mid_start + 3
+    local mid_start = 7
+    local mid_end = 10
     for x = mid_start, mid_end do
         for y = GRID_HEIGHT - 1, GRID_HEIGHT do
             grid[x][y].can_build = false

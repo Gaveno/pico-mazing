@@ -176,7 +176,7 @@ function update_title()
     end
 
     if game_difficulty ~= -1 and (btnp(2) or btnp(3)) then
-        game_difficulty = (game_difficulty + 1) % 2
+        game_difficulty = (game_difficulty + 1) % 3
     end
 end
 
@@ -256,16 +256,17 @@ function draw_title()
     end
 
     if game_difficulty >= 0 and (not title_transition or title_line_spawn % 2 == 0) then
-        draw_selector(6, 50, 80 + 12 * game_difficulty)
+        draw_selector(8, 47, 80 + 12 * game_difficulty)
         print("normal", 52, 80, 0)
         print("hard", 55, 92, 0)
+        print("legendary", 46, 104, 0)
     end
 
     print("bY gAVIN AND jACE aTKIN", 20, 120, 7)
 end
 
 function draw_selector(width, x, y)
-    for i = 0, width, 1 do
+    for i = 0, width do
         circfill(x + i * 4, y + 4 * (i + t()) % 3, 5, 7)
     end
 end
@@ -285,6 +286,7 @@ function draw_defeat_screen()
 end
 
 function draw_stats()
+    spr(75 + game_difficulty, 5, 5)
     print("waves survived "..(wave_number - 2), 30, 30, 12)
     print("bosses killed  "..bosses_killed, 30, 40, 12)
     print("elites killed  "..elites_killed, 30, 50, 12)
