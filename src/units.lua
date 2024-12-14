@@ -103,7 +103,10 @@ function update_units()
         if lookup(unit, 'movement_type', unit.type.movement_type) == 'fly' then
             move_flying_unit(unit)
         else
-            check_invalid_path(unit)
+            if check_invalid_nodes then
+                check_invalid_path(unit)
+            end
+            
             move_walking_unit(unit, unit_path_delay)
         end
 
@@ -146,12 +149,9 @@ function move_walking_unit(unit, unit_path_delay)
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
             unit.path_index = #new_path -- Start at beginning of path once found
-            if unit.path ~= nil then
-                unit.path_index = get_common_node(unit.x, unit.y, new_path)
-            end
-
             unit.path = new_path
             unit.path_invalid_node = nil
+            check_invalid_path(unit)
         end
     end
 
@@ -192,7 +192,7 @@ function move_unit_along_path(unit)
             -- Empty previous cell and update to next target
             unit_claim_cell(unit, next_cell.x, next_cell.y)
             -- Claim next cell
-            unit.path_index -= 1
+                unit.path_index -= 1
         end
     else
         unit.px += dx / dist * speed
@@ -202,11 +202,7 @@ end
 
 -- Check for path being invalid and recalculate if needed
 function check_invalid_path(unit)
-    if not check_invalid_nodes then
-        return
-    end
-
-    if not unit.path then
+    if unit.path == nil then
         return
     end
 
@@ -231,16 +227,6 @@ function check_invalid_path(unit)
     end
 end
 
-function get_common_node(node_from_x, node_from_y, path_to)
-    for i = #path_to, 1, -1 do
-        local tx = path_to[i].x
-        local ty = path_to[i].y
-        if node_from_x == tx and node_from_y == ty then
-            return i
-        end
-    end
-    return 3
-end
 
 function move_flying_unit(unit)
     if not wave_running then
