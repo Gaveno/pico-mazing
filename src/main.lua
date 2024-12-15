@@ -81,6 +81,17 @@ function _update()
     end
 end
 
+function create_line(x, y, dir)
+    return {
+        x = x,
+        y = y,
+        spd = 1,
+        dir = dir,
+        col = 8 + flr(rnd(5)),
+        len = flr(rnd(10)) + 2
+    }
+end
+
 function update_title()
     if not title_transition then
         if title_line_spawn > 0 then
@@ -88,42 +99,10 @@ function update_title()
         end
 
         if title_line_spawn == 0 then
-            local line_left = {
-                x = -1,
-                y = rnd(SCREEN_HEIGHT),
-                spd = 1,
-                dir = 0,
-                col = 8 + flr(rnd(5)),
-                len = flr(rnd(10)) + 2
-            }
-            add(title_lines, line_left)
-            local line_right = {
-                x = SCREEN_WIDTH,
-                y = rnd(SCREEN_HEIGHT),
-                spd = 1,
-                dir = 0.5,
-                col = 8 + flr(rnd(5)),
-                len = flr(rnd(10)) + 2
-            }
-            add(title_lines, line_right)
-            local line_top = {
-                x = rnd(SCREEN_WIDTH),
-                y = -1,
-                spd = 1,
-                dir = 0.75,
-                col = 8 + flr(rnd(5)),
-                len = flr(rnd(10)) + 2
-            }
-            add(title_lines, line_top)
-            local line_bottom = {
-                x = rnd(SCREEN_WIDTH),
-                y = SCREEN_HEIGHT,
-                spd = 1,
-                dir = 0.25,
-                col = 8 + flr(rnd(5)),
-                len = flr(rnd(10)) + 2
-            }
-            add(title_lines, line_bottom)
+            add(title_lines, create_line(-1, rnd(SCREEN_HEIGHT), 0))
+            add(title_lines, create_line(-SCREEN_WIDTH, rnd(SCREEN_HEIGHT), 0.5))
+            add(title_lines, create_line(rnd(SCREEN_WIDTH), -1, 0.75))
+            add(title_lines, create_line(rnd(SCREEN_WIDTH), SCREEN_HEIGHT, 0.25))
             title_line_spawn = 5
         end
     else
@@ -146,15 +125,13 @@ function update_title()
     -- Update title lines
     for i in all(title_lines) do
         if title_transition then
-            local text_y = 80
-            local text_x = SCREEN_WIDTH / 2
-            i.dir = atan2(i.x - text_x, i.y - text_y)
+            i.dir = atan2(i.x - 80, i.y - 64)
             i.spd = 4
         end
 
         i.x += cos(i.dir) * i.spd
         i.y += sin(i.dir) * i.spd
-        if i.x < -10 or i.x > SCREEN_WIDTH + 10 or i.y < -10 or i.y > SCREEN_HEIGHT + 10 then
+        if i.x < -10 or i.x > 138 or i.y < -10 or i.y > 138 then
             del(title_lines, i)
         end
     end
@@ -274,14 +251,14 @@ end
 function draw_victory_screen()
     cls(1)
     camera()
-    print("victory!", SCREEN_WIDTH / 2 - 20, 20, 10)
+    print("victory!", 44, 20, 10)
     draw_stats()
 end
 
 function draw_defeat_screen()
     cls(1)
     camera()
-    print("defeat!", SCREEN_WIDTH / 2 - 15, 20, 8)
+    print("defeat!", 49, 20, 8)
     draw_stats()
 end
 

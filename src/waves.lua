@@ -45,7 +45,7 @@ function prep_wave()
     wave_is_elite = contains(elite_waves, wave_number)
     wave_spawning_unit_type = next_unit_type
     wave_units_to_spawn = lookup(wave_spawning_unit_type, 'spawn_number', get_wave_unit_total(wave_number))
-    wave_units_to_spawn += d_flr_m(wave_number, 20, game_difficulty)
+    wave_units_to_spawn += d_flr_m(wave_number, 25, game_difficulty)
 end
 
 function get_wave_unit_total(wave)

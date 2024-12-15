@@ -80,8 +80,8 @@ end
 function sell_tower(x, y)
     local tower = get_tower_at(x, y)
     if tower then
-        local refund = ceil(tower.type.cost * 0.75)
-        diamonds += refund
+        -- local refund = ceil(tower.type.cost * 0.75)
+        diamonds += get_sell_price(tower)
         towers_sold += 1
         tower_set(x, y, nil)
     end
@@ -230,8 +230,12 @@ function draw_sell_menu()
     print("sell", x + 2, y + 4, 10)
     line(x + 20, y + 2, x + 20, y + 24, 10)
 
-    local refund = ceil(tower.type.cost * 0.75)
-    for i = 1, refund do
+    -- local refund = get_sell_price(tower) -- ceil(tower.type.cost * 0.75)
+    for i = 1, get_sell_price(tower) do
         spr(7, x + 22 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
+end
+
+function get_sell_price(tower)
+    return flr(tower.type.cost * 0.75)
 end

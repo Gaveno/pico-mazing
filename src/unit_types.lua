@@ -212,6 +212,7 @@ unit_types_list['Carrier'] = {
         end
 
         unit.cooldown = (unit.cooldown - 1) % unit.type.spawn_time
+        set_boss(unit)
 
         -- Check for ability to spawn
         local spawn_x = flr((unit.px + 12) / CELL_SIZE)
@@ -301,6 +302,7 @@ unit_types_list['BigBoy'] = {
 
         local real_cell_x = ceil((unit.px + 4) / CELL_SIZE)
         local real_cell_y = ceil((unit.py + 4) / CELL_SIZE)
+        set_boss(unit)
 
         if unit.movement_type == 'walk' then
             -- Walking, ready to jump
@@ -351,6 +353,7 @@ unit_types_list['ST6'] = {
         spawned_boss = unit
     end,
     update = function(unit)
+        set_boss(unit)
         if unit.health < unit.health_max / 4 * unit.charges and unit.invis_timer <= 0 and unit.anim == 0 then
             -- Go invis
             unit.invis_timer = 120

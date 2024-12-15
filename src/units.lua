@@ -6,6 +6,10 @@ spawned_boss = nil
 check_invalid_nodes = false
 
 -- Helper functions
+function set_boss(unit)
+    if (not spawned_boss) spawned_boss = unit
+end
+
 function get_flip(unit, d)
     return get_image(unit, d) == 0
 end
@@ -55,7 +59,7 @@ function spawn_unit(unit_type, x, y)
             tx = flr(rnd(3)),
             elite = wave_is_elite
         }
-        unit.health += game_difficulty * unit.health * 0.3
+        unit.health += game_difficulty * unit.health * 0.25
 
         if unit.type.init then
             unit.type.init(unit)
