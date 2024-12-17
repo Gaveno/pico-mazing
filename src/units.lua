@@ -145,16 +145,20 @@ function move_walking_unit(unit, unit_path_delay)
             EXIT_X + unit.tx + 1, EXIT_Y, unit.x, unit.y, lookup(unit.type, 'path_iterations', 14 - #units)
         )
         unit_path_delay = 40
+        printh("starting to find path. index: "..unit.path_index)
     end
 
     -- Keep processing path
     if unit.path_coroutine ~= nil then
+        printh("processing path")
         local new_path = nil
         unit.path_coroutine, new_path = process_path_coroutine(unit.path_coroutine)
         if new_path ~= nil then
+            printh("found new path "..#new_path)
             unit.path_index = #new_path -- Start at beginning of path once found
             if unit.path ~= nil then
                 unit.path_index = get_common_node(unit.x, unit.y, new_path)
+                printh("after common node "..unit.path_index)
             end
             unit.path = new_path
             unit.path_invalid_node = nil
@@ -201,9 +205,11 @@ function move_unit_along_path(unit)
             -- Empty previous cell and update to next target
             unit_claim_cell(unit, next_cell.x, next_cell.y)
             -- Claim next cell
-                unit.path_index -= 1
+            unit.path_index -= 1
+            printh("claiming path index "..unit.path_index)
         end
     else
+        printh("moving by "..dx.." "..dist.." "..speed)
         unit.px += dx / dist * speed
         unit.py += dy / dist * speed
     end
@@ -211,10 +217,13 @@ end
 
 function get_common_node(node_from_x, node_from_y, path_to)
     for i = #path_to, 1, -1 do
-        local tx = path_to[i].x
-        local ty = path_to[i].y
-        local dist = abs(node_from_x - tx) + abs(node_from_y - ty)
-        if dist <= 1 then
+        -- local tx = path_to[i].x
+        -- local ty = path_to[i].y
+        -- local dist = abs(node_from_x - tx) + abs(node_from_y - ty)
+        -- if dist < 1 then
+        --     return i
+        -- end
+        if path_to[i].x == node_from_x and path_to[i].y == node_from_y then
             return i
         end
     end

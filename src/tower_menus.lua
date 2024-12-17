@@ -230,12 +230,11 @@ function draw_sell_menu()
     print("sell", x + 2, y + 4, 10)
     line(x + 20, y + 2, x + 20, y + 24, 10)
 
-    -- local refund = get_sell_price(tower) -- ceil(tower.type.cost * 0.75)
     for i = 1, get_sell_price(tower) do
         spr(7, x + 22 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
 end
 
 function get_sell_price(tower)
-    return flr(tower.type.cost * 0.75)
+    return ceil(tower.type.cost * 0.75)
 end

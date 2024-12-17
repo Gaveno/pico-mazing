@@ -125,7 +125,7 @@ function update_title()
     -- Update title lines
     for i in all(title_lines) do
         if title_transition then
-            i.dir = atan2(i.x - 80, i.y - 64)
+            i.dir = atan2(i.x - 64, i.y - 80)
             i.spd = 4
         end
 
@@ -152,8 +152,13 @@ function update_title()
         sfx(5, 0, 0, 18)
     end
 
-    if game_difficulty ~= -1 and (btnp(2) or btnp(3)) then
-        game_difficulty = (game_difficulty + 1) % 3
+    if game_difficulty ~= -1 then
+        --  and (btnp(2) or btnp(3)) then
+        if btnp(2) then
+            game_difficulty = (game_difficulty - 1) % 3
+        elseif btnp(3) then
+            game_difficulty = (game_difficulty + 1) % 3
+        end
     end
 end
 
