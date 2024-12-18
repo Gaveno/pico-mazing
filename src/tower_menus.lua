@@ -236,5 +236,5 @@ function draw_sell_menu()
 end
 
 function get_sell_price(tower)
-    return ceil(tower.type.cost * 0.75)
+    return flr(tower.type.cost * 0.75)
 end

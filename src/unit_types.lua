@@ -334,7 +334,7 @@ unit_types_list['ST6'] = {
     damage = 6,
     spawn_number = 1,
     reward = 10,
-    health = function(wave_number) return 22.5 * wave_number + d_flr_m(wave_number, 5, 65) end,
+    health = function(wave_number) return 18 * wave_number + d_flr_m(wave_number, 5, 60) end,
     speed = function(unit, wave_number)
         if unit.anim > 0 and unit.anim < 45 then
             return 0

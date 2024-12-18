@@ -217,12 +217,6 @@ end
 
 function get_common_node(node_from_x, node_from_y, path_to)
     for i = #path_to, 1, -1 do
-        -- local tx = path_to[i].x
-        -- local ty = path_to[i].y
-        -- local dist = abs(node_from_x - tx) + abs(node_from_y - ty)
-        -- if dist < 1 then
-        --     return i
-        -- end
         if path_to[i].x == node_from_x and path_to[i].y == node_from_y then
             return i
         end
