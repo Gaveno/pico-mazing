@@ -8,3 +8,6 @@ Build towers to take out waves of enemies and survive until the end. Creatively 
 X: Build tower | Sell tower | Confirm
 Z: Cancel
 Arrows: Move cursor | Scroll tower selection
+
+## Towers
+![tower info](https://github.com/Gaveno/pico-mazing/blob/main/info/TowerInfo.drawio.png?raw=true)
