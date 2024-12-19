@@ -7,3 +7,6 @@
 *.js
 *.html
 *.zip
+
+# Draw io backups
+.$*.drawio.bkp
