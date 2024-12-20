@@ -9,8 +9,11 @@ X: Build tower | Sell tower | Confirm
 Z: Cancel
 Arrows: Move cursor | Scroll tower selection
 
-## Towers
+# Towers
 ![tower info](https://github.com/Gaveno/pico-mazing/blob/main/info/TowerInfo.drawio.png?raw=true)
 
-## Attackers
+# Attackers
 ![attacker info](https://github.com/Gaveno/pico-mazing/blob/main/info/UnitInfo.drawio.png?raw=true)
+
+# Bosses
+![bosses info](https://github.com/Gaveno/pico-mazing/blob/main/info/Bosses.drawio.png?raw=true)
