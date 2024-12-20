@@ -241,11 +241,10 @@ function draw_contextual_menu()
     local is_sell = get_tower_at(cursor.x, cursor.y)
     local action_str = is_sell and "x: sell" or "x: build"
     local color = is_sell and 8 or 11 -- Red for "sell" (color 8), green for "build" (color 11)
-    local full_text = action_str .. " tower"
-    local text_width = #full_text * 4 -- Total width of the full string
+    local text_width = #action_str * 4 -- Total width of the full string
 
     camera(0, 0)
-    print(full_text, 128 - text_width - 2, 122, color) -- Adjust padding as needed
+    print(action_str, 128 - text_width - 2, 122, color) -- Adjust padding as needed
 end
 
 function get_sell_price(tower)
