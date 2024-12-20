@@ -217,11 +217,19 @@ function draw_tower_menu()
     spr(10, x + POPUP_MENU_WIDTH/2 - 6, y + POPUP_MENU_HEIGHT + 2, 1, 1, false, true)
     spr(10, x + POPUP_MENU_WIDTH/2 + 2, y + POPUP_MENU_HEIGHT + 2, 1, 1, true, true)
     pal()
+
+    draw_confirm_cancel_menu()
 end
 
 function draw_sell_menu()
+    -- Calculate menu position to stay within the screen
     local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
-    local y = mid(0, (cursor.y - 1) * CELL_SIZE - 10, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
+
+    -- Place the menu above the cursor if possible; otherwise, adjust to stay on-screen
+    local y = (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10
+    if y < 0 then
+        y = (cursor.y - 1) * CELL_SIZE + 10 -- Move below cursor if not enough space above
+    end
 
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
     local tower = get_tower_at(cursor.x, cursor.y)
@@ -233,7 +241,30 @@ function draw_sell_menu()
     for i = 1, get_sell_price(tower) do
         spr(7, x + 22 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
+
+    draw_confirm_cancel_menu()
 end
+
+
+function draw_confirm_cancel_menu()
+    camera(0, 0)
+
+    -- Draw cancel on the bottom-left
+    print("o: cancel", 2, 122, 8)
+
+    -- Draw confirm on the bottom-right
+    print("x: confirm", 128 - 42, 122, 11) -- 42 = #("x: confirm") * 4 + 2
+end
+
+function draw_contextual_menu()    
+    local action_str = get_tower_at(cursor.x, cursor.y) and "x: sell" or "x: build"
+    local full_text = action_str .. " tower"
+    local text_width = #full_text * 4 -- Total width of the full string
+
+    camera(0, 0)
+    print(full_text, 128 - text_width - 2, 122, 0) -- Adjust padding as needed
+end
+
 
 function get_sell_price(tower)
     return flr(tower.type.cost * 0.75)
