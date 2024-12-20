@@ -4,7 +4,6 @@ title_y = 0
 title_lines = {}
 title_line_spawn = 0
 title_transition = false
-show_game_name = false
 game_difficulty = -1
 exp_timer = 0
 exp_x = 0
@@ -74,10 +73,6 @@ function _update()
         if btnp(5) or btnp(4) then
             _init()
         end
-    end
-
-    if btnp(5) and btnp(4) then
-        show_game_name = (not show_game_name)
     end
 end
 
@@ -184,12 +179,6 @@ function _draw()
     draw_units()
     draw_projectiles()
     draw_explosions()
-    if show_game_name then
-        palt(0, false)
-        palt(1, true)
-        spr(128, 6, 30, 15, 4)
-        palt()
-    end
     draw_cursor()
 
     if game_state == 'title' then
@@ -207,11 +196,9 @@ function _draw()
         return
     end
 
-    if not show_game_name then
-        camera()
-        draw_hud()
-        draw_boss_healthbar()
-    end
+    camera()
+    draw_hud()
+    draw_boss_healthbar()
 end
 
 function draw_title()
