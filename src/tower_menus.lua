@@ -124,7 +124,7 @@ function process_tower_build_path(path_co)
 end
 
 function draw_towers()
-    for key, tower in pairs(towers) do
+    for _, tower in pairs(towers) do
         local x = (tower.x - 1) * CELL_SIZE
         local y = (tower.y - 1) * CELL_SIZE
         tower.type.draw(tower, x, y)
@@ -132,18 +132,14 @@ function draw_towers()
 end
 
 function draw_tower_menu()
-    if building_coroutine ~= nil then
-        local x = (cursor.x - 1) * CELL_SIZE
-        local y = (cursor.y - 1) * CELL_SIZE
+    if building_coroutine then
+        local x, y = (cursor.x - 1) * CELL_SIZE, (cursor.y - 1) * CELL_SIZE
         rectfill(x, y, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 1)
         circ(x + CELL_SIZE / 2 - 1, y + CELL_SIZE / 2 - 1, cursor_size % 5, 12)
         return
     end
 
-    local cursor_y = -1
-    if cursor.y <= 8 then
-        cursor_y = 6
-    end
+    local cursor_y = cursor.y <= 8 and 6 or -1
     local x = mid(0, (cursor.x - 2) * CELL_SIZE - 18 + tower_menu_shake % 3, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
     local y = mid(25, (cursor.y + cursor_y) * CELL_SIZE - POPUP_MENU_HEIGHT - 10 + tower_menu_shake % 2, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
 
@@ -155,19 +151,15 @@ function draw_tower_menu()
     tower_type.draw({cooldown = 0, type = tower_type}, x + 10, y + POPUP_MENU_HEIGHT / 2 - 4)
 
     -- Draw cost
-    local cost = tower_type.cost
+    local cost, stat_start_y = tower_type.cost, y + 1
     for i = 1, cost do
-        if i > diamonds then
-            pal(12, 8)
-        end
+        if i > diamonds then pal(12, 8) end
         spr(7, x + 21 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
     pal()
 
     -- Draw tower stats
     -- Attack type
-    local stat_start_y = y + 1
-
     if tower_type.attack_type == 'laser' then
         line(x + 2, stat_start_y + 1, x + 6, stat_start_y + 5, 7)
     else
@@ -176,52 +168,49 @@ function draw_tower_menu()
 
     -- Power
     local power_width = 6
-    for i = 1, ceil(tower_type.attack_power / MAX_TOWER_POWER * power_width)  do
-        local line_bottom = flr(stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 1.5)
+    for i = 1, ceil(tower_type.attack_power / MAX_TOWER_POWER * power_width) do
         local line_x = x + 8 - i
-        line(line_x, line_bottom - ceil(i * 0.6), line_x, line_bottom, 10 - flr((i-1) / power_width * 3))
+        local line_bottom = flr(stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 1.5)
+        line(line_x, line_bottom - ceil(i * 0.6), line_x, line_bottom, 10 - flr((i - 1) / power_width * 3))
     end
 
     -- Range
     local range_number = flr((tower_type.attack_range - MIN_TOWER_RANGE - 2) / MAX_TOWER_RANGE * 4)
-    local range_image_x = 84 - range_number * 4
-    sspr(range_image_x, 16, 4, 6, x + 3, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 2 - 1)
+    sspr(84 - range_number * 4, 16, 4, 6, x + 3, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 2 - 1)
 
     -- Attack Speed
-    local practical_attack_speed = tower_type.attack_speed
-    if tower_type.attack_type == 'laser' then
-        practical_attack_speed = practical_attack_speed / 3
-    end
-
-    local attack_percent = percent_range(
-        (MAX_TOWER_ATTACK_SPEED - practical_attack_speed + 15),
-        MIN_TOWER_ATTACK_SPEED, MAX_TOWER_ATTACK_SPEED
-    )
+    local speed_factor = tower_type.attack_type == 'laser' and 3 or 1
+    local practical_speed = tower_type.attack_speed / speed_factor
+    local attack_percent = percent_range(MAX_TOWER_ATTACK_SPEED - practical_speed + 15, MIN_TOWER_ATTACK_SPEED, MAX_TOWER_ATTACK_SPEED)
     local images = ceil(attack_percent * 3)
     pal(7, 8 + flr(attack_percent * 4))
-    for i = 1, images do 
+    for i = 1, images do
         sspr(120, 0, 2, 4, x + i * 3, stat_start_y + POPUP_MENU_TOWER_STAT_SEP * 3)
     end
     pal()
 
     -- Arrows
-    if btn(2) then
-        pal(12, 10)
-    end
+    if btn(2) then pal(12, 10) end
     spr(10, x + POPUP_MENU_WIDTH/2 - 6, y - 9)
     spr(10, x + POPUP_MENU_WIDTH/2 + 2, y - 9, 1, 1, true, false)
     pal()
-    if btn(3) then
-        pal(12, 10)
-    end
+    if btn(3) then pal(12, 10) end
     spr(10, x + POPUP_MENU_WIDTH/2 - 6, y + POPUP_MENU_HEIGHT + 2, 1, 1, false, true)
     spr(10, x + POPUP_MENU_WIDTH/2 + 2, y + POPUP_MENU_HEIGHT + 2, 1, 1, true, true)
     pal()
+
+    draw_confirm_cancel_menu()
 end
 
 function draw_sell_menu()
+    -- Calculate menu position to stay within the screen
     local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
-    local y = mid(0, (cursor.y - 1) * CELL_SIZE - 10, GRID_HEIGHT * CELL_SIZE - POPUP_MENU_HEIGHT)
+
+    -- Place the menu above the cursor if possible; otherwise, adjust to stay on-screen
+    local y = (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10
+    if y < 0 then
+        y = (cursor.y - 1) * CELL_SIZE + 10 -- Move below cursor if not enough space above
+    end
 
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
     local tower = get_tower_at(cursor.x, cursor.y)
@@ -233,6 +222,29 @@ function draw_sell_menu()
     for i = 1, get_sell_price(tower) do
         spr(7, x + 22 + ((i - 1) % 4) * 8, y + flr((i - 1) / 4) * 8 + 2)
     end
+
+    draw_confirm_cancel_menu()
+end
+
+
+function draw_confirm_cancel_menu()
+    camera(0, 0)
+
+    -- Draw cancel on the bottom-left
+    print("o: cancel", 2, 122, 8)
+
+    -- Draw confirm on the bottom-right
+    print("x: confirm", 128 - 42, 122, 11) -- 42 = #("x: confirm") * 4 + 2
+end
+
+function draw_contextual_menu()    
+    local is_sell = get_tower_at(cursor.x, cursor.y)
+    local action_str = is_sell and "x: sell" or "x: build"
+    local color = is_sell and 8 or 11 -- Red for "sell" (color 8), green for "build" (color 11)
+    local text_width = #action_str * 4 -- Total width of the full string
+
+    camera(0, 0)
+    print(action_str, 128 - text_width - 2, 122, color) -- Adjust padding as needed
 end
 
 function get_sell_price(tower)

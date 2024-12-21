@@ -184,6 +184,8 @@ function _draw()
     if game_state == 'title' then
         draw_title()
         return
+    elseif game_state == "normal" then
+        draw_contextual_menu()
     elseif game_state == 'tower_menu' then
         draw_tower_menu()
     elseif game_state == 'sell_menu' then
@@ -229,9 +231,11 @@ function draw_title()
         print("normal", 52, 80, 0)
         print("hard", 55, 92, 0)
         print("legendary", 46, 104, 0)
+
+        print("x: confirm", 85, 120, 7)
     end
 
-    print("bY gAVIN AND jACE aTKIN", 20, 120, 7)
+    print("bY gAVIN AND jACE aTKIN", 20, 55, 7)
 end
 
 function draw_selector(width, x, y)
