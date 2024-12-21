@@ -216,7 +216,8 @@ function draw_title()
 
     palt(0, false)
     palt(1, true)
-    spr(128, 6, -sin(percent_range(title_y, 0, 30) / 4) * 30, 15, 4)
+    local ty = -sin(percent_range(title_y, 0, 30) / 4) * 30
+    spr(128, 6, ty, 15, 4)
     palt()
 
     if title_y >= 30 and game_difficulty == -1 then
@@ -235,7 +236,7 @@ function draw_title()
         print("x: confirm", 85, 120, 7)
     end
 
-    print("bY gAVIN AND jACE aTKIN", 20, 55, 7)
+    print("bY gAVIN AND jACE aTKIN", 20, ty + 25, 7)
 end
 
 function draw_selector(width, x, y)
