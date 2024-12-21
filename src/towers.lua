@@ -60,8 +60,8 @@ function find_nearest_unit_in_range(tower)
 end
 
 function tower_distance_to_unit(tower, unit)
-    local dx = abs(unit.px - (tower.x - 1) * CELL_SIZE)
-    local dy = abs(unit.py - (tower.y - 1) * CELL_SIZE)
+    local dx = abs(unit.px - grid_to_room(tower.x))
+    local dy = abs(unit.py - grid_to_room(tower.y))
     if dx <= tower.type.attack_range and dy <= tower.type.attack_range then
         return sqrt(dx * dx + dy * dy)
     end

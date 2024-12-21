@@ -43,7 +43,7 @@ function update_cursor()
     cursor.y = mid(1, cursor.y, GRID_HEIGHT)
     camera(
         0,
-        mid((cursor.y - 1)*CELL_SIZE - (SCREEN_HEIGHT/2 - CELL_SIZE/2), -HUD_HEIGHT, GRID_HEIGHT*CELL_SIZE - SCREEN_HEIGHT)
+        mid(grid_to_room(cursor.y) - (SCREEN_HEIGHT/2 - CELL_SIZE/2), -HUD_HEIGHT, GRID_HEIGHT*CELL_SIZE - SCREEN_HEIGHT)
     )
 
     if game_state ~= 'normal' then
@@ -64,8 +64,8 @@ end
 
 function draw_cursor()
     local color = cursor_colors[cursor_color_index]
-    local x = (cursor.x - 1) * CELL_SIZE
-    local y = (cursor.y - 1) * CELL_SIZE
+    local x = grid_to_room(cursor.x)
+    local y = grid_to_room(cursor.y)
     rect(x - cursor_size/3, y - cursor_size/3, x + CELL_SIZE - 1 + cursor_size/3, y + CELL_SIZE - 1 + cursor_size/3, color)
     if cursor_cannot_build_timer/2 % 2 > 0 then
         rectfill(x, y, x + CELL_SIZE - 1, y + CELL_SIZE - 1, 8)

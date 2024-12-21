@@ -28,6 +28,7 @@ function update_waves()
 
     if not wave_running and wave_timer > 0 then
         wave_timer -= 1
+        if (btn(4)) wave_timer -= 5
     end
 
     if wave_timer <= 0 and wave_number <= 35 then

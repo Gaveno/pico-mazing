@@ -11,8 +11,8 @@ function create_projectile(tower, target_unit)
     end
     local projectile = {
         type = tower.type.attack_type,
-        x = (tower.x - 1) * CELL_SIZE + lookup(tower, 'proj_launch_x', tower.type.proj_launch_x),
-        y = (tower.y - 1) * CELL_SIZE + lookup(tower, 'proj_launch_y', tower.type.proj_launch_y),
+        x = grid_to_room(tower.x) + lookup(tower, 'proj_launch_x', tower.type.proj_launch_x),
+        y = grid_to_room(tower.y) + lookup(tower, 'proj_launch_y', tower.type.proj_launch_y),
         target = target_unit,
         speed = tower.type.projectile_speed,
         attack_power = tower.type.attack_power,

@@ -95,7 +95,7 @@ function update_title()
 
         if title_line_spawn == 0 then
             add(title_lines, create_line(-1, rnd(SCREEN_HEIGHT), 0))
-            add(title_lines, create_line(-SCREEN_WIDTH, rnd(SCREEN_HEIGHT), 0.5))
+            add(title_lines, create_line(SCREEN_WIDTH, rnd(SCREEN_HEIGHT), 0.5))
             add(title_lines, create_line(rnd(SCREEN_WIDTH), -1, 0.75))
             add(title_lines, create_line(rnd(SCREEN_WIDTH), SCREEN_HEIGHT, 0.25))
             title_line_spawn = 5

@@ -44,8 +44,8 @@ function spawn_unit(unit_type, x, y)
         local unit = {
             x = spawn_x,
             y = spawn_y,
-            px = (spawn_x - 1) * CELL_SIZE,
-            py = (spawn_y - 1) * CELL_SIZE,
+            px = grid_to_room(spawn_x),
+            py = grid_to_room(spawn_y),
             path_coroutine = nil,
             path = nil,
             path_index = 1,
@@ -189,8 +189,8 @@ function move_unit_along_path(unit)
         return
     end
 
-    local target_px = (target_cell.x - 1) * CELL_SIZE
-    local target_py = (target_cell.y - 1) * CELL_SIZE
+    local target_px = grid_to_room(target_cell.x)
+    local target_py = grid_to_room(target_cell.y)
 
     local dx = target_px - unit.px
     local dy = target_py - unit.py

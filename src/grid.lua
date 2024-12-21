@@ -35,11 +35,15 @@ function init_grid()
     end
 end
 
+function grid_to_room(v)
+    return (v - 1) * CELL_SIZE
+end
+
 function draw_grid()
     for x = 1, GRID_WIDTH do
         for y = 1, GRID_HEIGHT do
-            local px = (x - 1) * CELL_SIZE
-            local py = (y - 1) * CELL_SIZE
+            local px = grid_to_room(x)
+            local py = grid_to_room(y)
             local cell = grid[x][y]
             spr(3 + (x + y) % 3, px, py)
             if not cell.can_build then

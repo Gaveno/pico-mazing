@@ -125,15 +125,15 @@ end
 
 function draw_towers()
     for _, tower in pairs(towers) do
-        local x = (tower.x - 1) * CELL_SIZE
-        local y = (tower.y - 1) * CELL_SIZE
+        local x = grid_to_room(tower.x)
+        local y = grid_to_room(tower.y)
         tower.type.draw(tower, x, y)
     end
 end
 
 function draw_tower_menu()
     if building_coroutine then
-        local x, y = (cursor.x - 1) * CELL_SIZE, (cursor.y - 1) * CELL_SIZE
+        local x, y = grid_to_room(cursor.x), grid_to_room(cursor.y)
         rectfill(x, y, x + CELL_SIZE - 2, y + CELL_SIZE - 2, 1)
         circ(x + CELL_SIZE / 2 - 1, y + CELL_SIZE / 2 - 1, cursor_size % 5, 12)
         return
@@ -204,12 +204,12 @@ end
 
 function draw_sell_menu()
     -- Calculate menu position to stay within the screen
-    local x = mid(0, (cursor.x - 1) * CELL_SIZE - 20, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
+    local x = mid(0, grid_to_room(cursor.x) - 20, GRID_WIDTH * CELL_SIZE - POPUP_MENU_WIDTH)
 
     -- Place the menu above the cursor if possible; otherwise, adjust to stay on-screen
-    local y = (cursor.y - 1) * CELL_SIZE - POPUP_MENU_HEIGHT - 10
+    local y = grid_to_room(cursor.y) - POPUP_MENU_HEIGHT - 10
     if y < 0 then
-        y = (cursor.y - 1) * CELL_SIZE + 10 -- Move below cursor if not enough space above
+        y = grid_to_room(cursor.y) + 10 -- Move below cursor if not enough space above
     end
 
     rectfill(x, y, x + POPUP_MENU_WIDTH, y + POPUP_MENU_HEIGHT, 0)
@@ -245,6 +245,7 @@ function draw_contextual_menu()
 
     camera(0, 0)
     print(action_str, 128 - text_width - 2, 122, color) -- Adjust padding as needed
+    if (not wave_running) print("o: faster", 2, 122, 9)
 end
 
 function get_sell_price(tower)
