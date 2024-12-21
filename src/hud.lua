@@ -14,12 +14,14 @@ function draw_hud()
     rectfill(0, 0, SCREEN_WIDTH - 1, HUD_HEIGHT, 0)
 
     -- Draw lives
-    for i = 1, lives do
+    if lives > 6 then pal({[8]=12, [14]=7}) end
+    for i = 1, min(lives, 6) do
         local hi = (i - 1) % 3
         local hx = hi * 8 + hi
         local hy = ceil(i / 3 - 1) * 8
         spr(6, hx, hy)
     end
+    pal()
 
     -- Draw diamonds
     local tower_cost = 0

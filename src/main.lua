@@ -52,6 +52,8 @@ function _init()
     lives_lost = 0
 
     prep_wave()
+
+    menuitem(1, "ramo's button", function() lives += 6 end)
 end
 
 function _update()
